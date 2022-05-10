@@ -1,4 +1,5 @@
 # %%
+from pyparsing import col
 from dataset import df_prevention
 import streamlit as st
 import plotly.express as px
@@ -49,6 +50,7 @@ def app():
                                         'July','August','September']}
             ), use_container_width=True
         )
+
         
     with col2:
         st.plotly_chart(
@@ -62,6 +64,29 @@ def app():
         ).update_traces(texttemplate="%{y}"),
         use_container_width=True
         )
+
+    with col1:
+        st.plotly_chart(
+            px.histogram(
+                data_frame=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A'],
+                x='Month',
+                color='GBV',
+                text_auto=True
+            ),use_container_width=True
+        )
+    
+    with col2:
+        st.plotly_chart(
+            px.line(
+                pd.crosstab(
+                    columns=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['GBV'],
+                    index=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['Month']
+                ).cumsum(),
+                text='GBV'
+            ).update_traces(texttemplate="%{y}"),
+            use_container_width=True
+        )
+
     Month = st.multiselect(
         'Month',
         options=df_prevention_selections['Month'].unique(),

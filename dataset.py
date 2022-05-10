@@ -104,7 +104,7 @@ extract4 = pd.read_sql(d, mydb)
 df_prevention = pd.DataFrame(extract4)
 
 
-group2 = df_hts.groupby('Financial_Year')
+group2 = df_prevention.groupby('Financial_Year')
 # Steps_FY1 = group1.get_group('Steps_FY1')
 # Steps_FY1 = Steps_FY1p.drop_duplicates(
 #     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
@@ -128,7 +128,7 @@ Vukisha_FY1p = Vukisha_FY1p.drop_duplicates(
     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 
 frames2 = [Steps_FY2p, Steps_FY4p, Steps_FY5p, Vukisha_FY1p]
-df_hts = pd.concat(frames2)
+df_prevention = pd.concat(frames2)
 
 df_prevention['AgeGroup'] = pd.cut(
     df_prevention['Age'], bins=bins, labels=labels, right=False)

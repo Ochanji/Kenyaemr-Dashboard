@@ -37,6 +37,7 @@ SELECT
 	END AS 'PopulationType',
 	CASE
 		WHEN co.key_population_type IS NULL THEN 'General Population'
+		WHEN co.key_population_type = 'MSW' THEN 'MSM'
 		ELSE co.key_population_type
 	END AS 'KeyPopulationType',
 	CASE
@@ -68,10 +69,34 @@ SELECT
 	CASE
 		WHEN cx.visit_date between '2021-10-01'
 		AND '2022-09-30'
-		and cx.visit_date IS NOT NULL THEN 'Screened'
+		and cx.visit_date IS NOT NULL 
+        and pd.Gender != 'M' THEN 'Screened'
+        when pd.Gender = 'M' then 'NA'
 		else 'Not Screened'
 	end as 'CaCx',
-	monthname(cx.visit_date) as 'Last Visit Month'
+	monthname(tx.latest_vis_date) as 'Last Visit Month',
+    CASE
+		WHEN tx.latest_vis_date BETWEEN '2016-10-01'
+		AND '2017-09-30' THEN 'Steps_FY1'
+		WHEN tx.latest_vis_date BETWEEN '2017-10-01'
+		AND '2018-09-30' THEN 'Steps_FY2'
+		WHEN tx.latest_vis_date BETWEEN '2018-10-01'
+		AND '2019-09-30' THEN 'Steps_FY3'
+		WHEN tx.latest_vis_date BETWEEN '2019-10-01'
+		AND '2020-09-30' THEN 'Steps_FY4'
+		WHEN tx.latest_vis_date BETWEEN '2020-10-01'
+		AND '2021-09-30' THEN 'Steps_FY5'
+		WHEN tx.latest_vis_date BETWEEN '2021-10-01'
+		AND '2022-09-30' THEN 'Vukisha_FY1'
+		WHEN tx.latest_vis_date BETWEEN '2022-10-01'
+		AND '2023-09-30' THEN 'Vukisha_FY2'
+		WHEN tx.latest_vis_date BETWEEN '2023-10-01'
+		AND '2024-09-30' THEN 'Vukisha_FY3'
+		WHEN tx.latest_vis_date BETWEEN '2024-10-01'
+		AND '2025-09-30' THEN 'Vukisha_FY4'
+		WHEN tx.latest_vis_date BETWEEN '2025-10-01'
+		AND '2026-09-30' THEN 'Vukisha_FY5'
+	END AS 'Financial_Year'
 FROM
 	kenyaemr_etl.etl_hiv_enrollment hv
 	LEFT JOIN kenyaemr_etl.etl_current_in_care tx ON hv.patient_id = tx.patient_id

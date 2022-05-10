@@ -40,7 +40,7 @@ class MultiApp:
 
     def run(self):
         # app = st.sidebar.radio(
-        st.title('Select Program Area Of Focus')
+        st.header('Select Program Area Of Focus')
         app = st.selectbox(
             'Navigation',
             self.apps,

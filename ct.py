@@ -11,6 +11,13 @@ df_ct['Month'] = pd.Categorical(
                 'April', 'May', 'June',
                 'July', 'August', 'September']
 )
+df_ct['Last Visit Month'] = pd.Categorical(
+    values=df_ct['Last Visit Month'],
+    categories=['October', 'November', 'December',
+                'January', 'February', 'March',
+                'April', 'May', 'June',
+                'July', 'August', 'September']
+)
 
 
 def app():
@@ -28,6 +35,7 @@ def app():
         "Status == @Status")
 
     Fy = df_ct_selections[df_ct_selections['Financial_Year_'] == 'Vukisha_FY1']
+    Fyc = df_ct_selections[df_ct_selections['Financial_Year'] == 'Vukisha_FY1']
 
     st.plotly_chart(
         px.line(
@@ -54,6 +62,19 @@ def app():
                                            'July', 'August', 'September']}
             ), use_container_width=True
         )
+        st.plotly_chart(
+            px.histogram(
+                data_frame=Fyc[Fyc['Gender'] == 'F'],
+                x='Last Visit Month',
+                color='CaCx',
+                barmode='group',
+                text_auto=True,
+                category_orders={'Last Visit Month': ['October', 'November', 'December',
+                                                      'January', 'February', 'March',
+                                                      'April', 'May', 'June',
+                                                      'July', 'August', 'September']}
+            ), use_container_width=True
+        )
     with col2:
         st.plotly_chart(
             px.line(
@@ -65,6 +86,17 @@ def app():
                 text='PopulationType'
             ).update_traces(texttemplate="%{y}"), use_container_width=True
         )
+
+        st.plotly_chart(
+            px.line(
+                pd.crosstab(
+                    index=Fyc[Fyc['Gender'] == 'F']['Last Visit Month'],
+                    columns=Fyc[Fyc['Gender'] == 'F']['CaCx']
+                ).cumsum(),
+                markers=True,
+                text='CaCx'
+            ).update_traces(texttemplate="%{y}"), use_container_width=True
+        )
     col3, col4, col5 = st.columns(3)
     with col3:
         st.plotly_chart(
@@ -73,7 +105,13 @@ def app():
                 names='VLResults',
                 color='VLResults',
                 title='Viral Load Results Proportions'
-            ),use_container_width=True
+            ), use_container_width=True
+        )
+        st.table(
+            pd.crosstab(
+                columns=df_ct_selections['VLResults'],
+                index=''
+            )
         )
     with col4:
         st.plotly_chart(
@@ -82,8 +120,15 @@ def app():
                 names='KeyPopulationType',
                 color='KeyPopulationType',
                 title='Key Population Proportions'
-            ),use_container_width=True
+            ), use_container_width=True
         )
+        st.table(
+            pd.crosstab(
+                columns=df_ct_selections['KeyPopulationType'],
+                index=''
+            )
+        )
+
     with col5:
         st.plotly_chart(
             px.pie(
@@ -91,7 +136,13 @@ def app():
                 names='CaCx',
                 color='CaCx',
                 title='Proportion Screened for CxCa'
-            ),use_container_width=True
+            ), use_container_width=True
+        )
+        st.table(
+            pd.crosstab(
+                columns=df_ct_selections['CaCx'],
+                index=''
+            )
         )
 
     @st.cache
