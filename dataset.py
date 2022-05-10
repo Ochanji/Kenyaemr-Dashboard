@@ -97,7 +97,7 @@ df_hts['AgeGroup'] = pd.cut(
 sql_query4 = open(
     r'sql_queries\prevention.sql').read().split(';\n')
 
-for d in sql_query3:
+for d in sql_query4:
     print(d)
 
 extract4 = pd.read_sql(d, mydb)
@@ -106,25 +106,25 @@ df_prevention = pd.DataFrame(extract4)
 
 group2 = df_hts.groupby('Financial_Year')
 # Steps_FY1 = group1.get_group('Steps_FY1')
-# Steps_FY1 = Steps_FY1.drop_duplicates(
+# Steps_FY1 = Steps_FY1p.drop_duplicates(
 #     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 Steps_FY2p = group2.get_group('Steps_FY2')
-Steps_FY2p = Steps_FY2.drop_duplicates(
+Steps_FY2p = Steps_FY2p.drop_duplicates(
     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 # Steps_FY3 = group1.get_group('Steps_FY3')
-# Steps_FY3 = Steps_FY3.drop_duplicates(
+# Steps_FY3 = Steps_FY3p.drop_duplicates(
 #     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 
 Steps_FY4p = group2.get_group('Steps_FY4')
-Steps_FY4p = Steps_FY4.drop_duplicates(
+Steps_FY4p = Steps_FY4p.drop_duplicates(
     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 
 Steps_FY5p = group2.get_group('Steps_FY5')
-Steps_FY5p = Steps_FY5.drop_duplicates(
+Steps_FY5p = Steps_FY5p.drop_duplicates(
     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 
 Vukisha_FY1p = group2.get_group('Vukisha_FY1')
-Vukisha_FY1p = Vukisha_FY1.drop_duplicates(
+Vukisha_FY1p = Vukisha_FY1p.drop_duplicates(
     ['First Name', 'Middle Name', 'Last Name', 'Age', 'Gender'], keep='first')
 
 frames2 = [Steps_FY2p, Steps_FY4p, Steps_FY5p, Vukisha_FY1p]

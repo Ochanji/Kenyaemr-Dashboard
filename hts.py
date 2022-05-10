@@ -1,3 +1,4 @@
+from numpy import cumsum
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -7,40 +8,32 @@ df_hts['Month'] = pd.Categorical(df_hts['Month'], categories=['October', 'Novemb
                                         'January','February','March',
                                         'April','May','June',
                                         'July','August','September'])
+df_hts['HTSResust'] = pd.Categorical(df_hts['HTSResult'], categories=['Negative', 'Positive'])
+
+
 def app():
     st.markdown('#### :bar_chart: HTS Dashboard')
+
     st.markdown('------------------------------------')
-    st.markdown(
-        '''
-        
-        '''
-    )
-    st.markdown('------------------------------------')
-    ##################################################################################################################
-    st.sidebar.header('Filters')
-    st.sidebar.markdown('------------------------------------')
-    Financial_Year = st.sidebar.multiselect(
+    Financial_Year = st.multiselect(
         'Select Year',
         options=df_hts['Financial_Year'].unique(),
         default=df_hts['Financial_Year'].iloc[-1]
     )
 
     df_hts_selections = df_hts.query(
-        "Financial_Year == @Financial_Year"
-    )
+        "Financial_Year == @Financial_Year")
 
-####################################################################################################################
-
-####################################################################################################################
     st.plotly_chart(
         px.line(
             pd.crosstab(
                 index=df_hts_selections['Month'],
                 columns=df_hts_selections['HTSResult']
             ),
-            markers=True
-            # text=['Negative', 'Positive']
-        ),use_container_width=True
+            markers=True,
+            text='HTSResult'
+        ).update_traces(texttemplate="%{y}"),
+        use_container_width=True
     )
     col1, col2 = st.columns(2)  
     with col1:
@@ -60,64 +53,79 @@ def app():
         st.plotly_chart(
             px.histogram(
                 data_frame=df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation'],
-                x='Month', 
-                text_auto=True,
+                x='Month',
                 title='Monthly HTS_TST (KP) Achievement',
+                text_auto=True,
                 color='HTSResult',
                 category_orders={'Month':['October', 'November', 'December', 
                                         'January','February','March',
                                         'April','May','June',
                                         'July','August','September']}
-            ), use_container_width=True
+            ),use_container_width=True
         )
 
     st.markdown('------------------------------------')
     with col2:        
         st.plotly_chart(
-            px.histogram(
-                data_frame=df_hts_selections,
-                x='Month', 
-                title='Cummulative HTS_TST Achievement',
-                text_auto=True,
-                cumulative=True,
-                color='HTSResult',
-                category_orders={'Month':['October', 'November', 'December', 
-                                        'January','February','March',
-                                        'April','May','June',
-                                        'July','August','September']}
-            ), use_container_width=True
-        )  
+            px.line(
+                pd.crosstab(
+                index=df_hts_selections['Month'],
+                columns=df_hts_selections['HTSResult']
+                ).cumsum(),
+                markers=True,
+                text='HTSResult',
+                title='Cumulative HTS_TST Achievement'
+            ).update_traces(texttemplate="%{y}"), 
+            use_container_width=True
+        )
 
         st.plotly_chart(
-            px.histogram(
-                data_frame=df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation'],
-                x='Month', 
-                text_auto=True,
-                color='HTSResult',
-                title='Cummulative HTS_TST (KP) Achievement',
-                cumulative=True,
-                category_orders={'Month':['October', 'November', 'December', 
-                                        'January','February','March',
-                                        'April','May','June',
-                                        'July','August','September']}
-            ), use_container_width=True
+            px.line(
+                pd.crosstab(
+                    index=df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation']['Month'],
+                    columns=df_hts_selections['HTSResult']
+                ).cumsum(),
+                markers=True,
+                text='HTSResult',
+                title='Cumulative HTS_TST (KP) Achievement'
+            ).update_traces(texttemplate="%{y}"), 
+            use_container_width=True
         )
 
     st.markdown('------------------------------------')
 
-    st.sidebar.markdown('------------------------------------')
+    st.markdown('------------------------------------')
 
-    st.sidebar.multiselect(
+    Month = st.multiselect(
         'Month',
-        options=df_hts['Month'].unique(),
-        default=df_hts['Month'].iloc[-1]
+        options=df_hts_selections['Month'].unique(),
+        default=df_hts_selections['Month'].iloc[-1]
     )
 
-    df_hts_selections_Month = df_hts_selections.query('Month == @Month')
+    df_hts_month = df_hts_selections.query(
+        "Month == @Month")
 
-    st.sidebar.markdown('------------------------------------')
+    st.markdown('------------------------------------')
 
-
+    m1, m2 = st.columns(2)
+    with m1:
+        st.plotly_chart(
+            px.histogram(
+                data_frame=df_hts_month,
+                y='Provider',
+                color='HTSResult',
+                text_auto=True
+            ), use_container_width=True
+        )
+    with m2:
+        st.plotly_chart(
+            px.histogram(
+                data_frame=df_hts_month,
+                y='Provider',
+                color='PopulationType',
+                text_auto=True
+            ), use_container_width=True
+        )
 
 
     st.markdown('------------------------------------')
@@ -132,7 +140,6 @@ def app():
     # )
 
 
-##################################################################################################################################
     @st.cache
     def convert_df(df):
         # IMPORTANT: Cache the conversion to prevent computation on every rerun

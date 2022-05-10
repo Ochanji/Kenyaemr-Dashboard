@@ -12,8 +12,8 @@ app = MultiApp()
 # Add all your application here
 app.add_app("Overview", overview.app)
 app.add_app("HTS Services", hts.app)
-app.add_app("Care & Treatment", ct.app)
 app.add_app("Prevention", prevention.app)
+app.add_app("Care & Treatment", ct.app)
 # app.add_app("Reporting", reporting.app)
 # The main app
 app.run()
