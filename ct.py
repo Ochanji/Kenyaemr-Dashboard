@@ -36,6 +36,33 @@ def app():
 
     Fy = df_ct_selections[df_ct_selections['Financial_Year_'] == 'Vukisha_FY1']
     Fyc = df_ct_selections[df_ct_selections['Financial_Year'] == 'Vukisha_FY1']
+    ca = Fyc[Fyc['Gender'] == 'F']
+
+    kpcurr = 764
+    kpnew = 72
+    cancer = 191
+    
+    curr = len(df_ct_selections[df_ct_selections['PopulationType'] == 'KeyPopulation']['First Name'])
+    new = len(Fy[Fy['PopulationType'] == 'KeyPopulation']['First Name'])
+    cacx = len(Fyc[Fyc['CaCx'] == 'Screened']['First Name'])
+
+    currp = round(((curr/kpcurr)*100),1)
+    newp = round(((new/kpnew)*100),1)
+    cacxp = round(((cacx/cancer)*100),1)
+
+    tx_curr = len(df_ct_selections['First Name'])
+
+    hed1, hed2 = st.columns(2)
+    st.markdown(f"")
+    with hed1:
+        st.markdown(f"###### TX_NEW Target: {kpnew}")
+        st.markdown(f"###### TX_CURR Target: {kpcurr}")
+        st.markdown(f"###### CxCa (KP) Target: {cancer}")
+    with hed2:
+        st.markdown(f"###### TX_NEW Achievement: {new} ({newp}%)")
+        st.markdown(f"###### TX_CURR Achievement: {curr} ({currp}%)")
+        st.markdown(f"###### CxCa Achievement: {cacx} ({cacxp}%)")
+
 
     st.plotly_chart(
         px.line(
@@ -62,12 +89,13 @@ def app():
                                            'July', 'August', 'September']}
             ), use_container_width=True
         )
+        
         st.plotly_chart(
             px.histogram(
-                data_frame=Fyc[Fyc['Gender'] == 'F'],
+                data_frame=ca[ca['CaCx'] == 'Screened'],
                 x='Last Visit Month',
                 color='CaCx',
-                barmode='group',
+                # barmode='group',
                 text_auto=True,
                 category_orders={'Last Visit Month': ['October', 'November', 'December',
                                                       'January', 'February', 'March',
@@ -90,8 +118,8 @@ def app():
         st.plotly_chart(
             px.line(
                 pd.crosstab(
-                    index=Fyc[Fyc['Gender'] == 'F']['Last Visit Month'],
-                    columns=Fyc[Fyc['Gender'] == 'F']['CaCx']
+                    index=ca[ca['CaCx'] == 'Screened']['Last Visit Month'],
+                    columns=ca[ca['CaCx'] == 'Screened']['CaCx']
                 ).cumsum(),
                 markers=True,
                 text='CaCx'

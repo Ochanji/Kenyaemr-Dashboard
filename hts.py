@@ -1,3 +1,4 @@
+from email import header
 from numpy import cumsum
 import pandas as pd
 import streamlit as st
@@ -9,6 +10,8 @@ df_hts['Month'] = pd.Categorical(df_hts['Month'], categories=['October', 'Novemb
                                         'April','May','June',
                                         'July','August','September'])
 df_hts['HTSResust'] = pd.Categorical(df_hts['HTSResult'], categories=['Negative', 'Positive'])
+TST_Target = 5582
+POS_Target = 76
 
 
 def app():
@@ -23,6 +26,23 @@ def app():
 
     df_hts_selections = df_hts.query(
         "Financial_Year == @Financial_Year")
+    
+    KP = df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation']
+
+    TST_Achievement_Neg = int(len(KP[KP['HTSResult'] == 'Negative']['First Name']))
+    TST_Achievement_Pos = int(len(KP[KP['HTSResult'] == 'Positive']['First Name']))
+
+    TST_Proportion = round(((TST_Achievement_Neg/TST_Target)*100),1)
+    Pos_Proportion = round(((TST_Achievement_Pos/POS_Target)*100),1)
+    
+    hed1, hed2 = st.columns(2)
+
+    with hed1:
+        st.markdown(f"###### HTS_TST Target: {TST_Target}")
+        st.markdown(f"###### HTS_POS Target: {POS_Target}")
+    with hed2:
+        st.markdown(f"###### HTS_TST Achievement {TST_Achievement_Neg} ({TST_Proportion}%)")
+        st.markdown(f"###### HTS_POS Achievement {TST_Achievement_Pos} ({Pos_Proportion}%)")
 
     st.plotly_chart(
         px.line(
@@ -112,18 +132,20 @@ def app():
         st.plotly_chart(
             px.histogram(
                 data_frame=df_hts_month,
-                y='Provider',
+                x='Provider',
                 color='HTSResult',
-                text_auto=True
+                text_auto=True,
+                category_orders={'HTSResult':['Negative','Positive']}
             ), use_container_width=True
         )
     with m2:
         st.plotly_chart(
             px.histogram(
                 data_frame=df_hts_month,
-                y='Provider',
+                x='Provider',
                 color='PopulationType',
-                text_auto=True
+                text_auto=True,
+                category_orders={'PopulationType':['KeyPopulation','General Population']}
             ), use_container_width=True
         )
 

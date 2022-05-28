@@ -1,13 +1,34 @@
 # %%
 # Packages
+from sqlalchemy import create_engine, text
 import mysql.connector
 import pandas as pd
-
 # ------------------------------------------------------------------------------------
+# %%
+# url = 'mysql+pymysql://vin:Vin123**@127.0.0.1:3306'
+# engine = create_engine(url, echo=True)
+
+# querry1 = open(r'sql_queries/etl_provider table.sql').read().split(';\n')
+# for line in querry1:
+#     line 
+
+# sql1 = text('USE kenyaemr_etl')
+# engine.execute(sql1)
+
+# sql2 = text('DROP TABLE IF EXISTS etl_provider')
+# engine.execute(sql2)
+
+# sql3 = text('CREATE TABLE etl_provider (creator_id INT, provider VARCHAR(50))')
+# engine.execute(sql3)
+
+# sql4 = text(line)
+# engine.execute(sql4)
+
+
 # %%
 # Connection Instance
 mydb = mysql.connector.connect(
-    host="localhost",
+    host="127.0.0.1",
     user="vin",
     password="Vin123**",
     database="kenyaemr_etl")
@@ -26,7 +47,7 @@ labels = ['14yrs & below', '18-19yrs', '20-24yrs', '25-29yrs',
 # %%
 # Overview Data
 sql_query1 = open(
-    r'sql_queries\overview.sql').read().split(';\n')
+    r'sql_queries/overview.sql').read().split(';\n')
 
 for a in sql_query1:
     print(a)
@@ -40,7 +61,7 @@ df_overview['AgeGroup'] = pd.cut(
 # %%
 # C&T Data
 sql_query2 = open(
-    r'sql_queries\ct.sql').read().split(';\n')
+    r'sql_queries/ct.sql').read().split(';\n')
 
 for b in sql_query2:
     print(b)
@@ -55,7 +76,7 @@ df_ct['AgeGroup'] = pd.cut(
 # %%
 # HTS Data
 sql_query3 = open(
-    r'sql_queries\HTS.sql').read().split(';\n')
+    r'sql_queries/HTS.sql').read().split(';\n')
 
 for c in sql_query3:
     print(c)
@@ -95,7 +116,7 @@ df_hts['AgeGroup'] = pd.cut(
 # %%
 # Prevention
 sql_query4 = open(
-    r'sql_queries\prevention.sql').read().split(';\n')
+    r'sql_queries/prevention.sql').read().split(';\n')
 
 for d in sql_query4:
     print(d)

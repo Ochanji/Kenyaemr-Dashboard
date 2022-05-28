@@ -24,6 +24,29 @@ def app():
 
     df_prevention_selections = df_prevention.query(
         "Financial_Year == @Financial_Year")
+    
+    kpfsw = int(len(df_prevention_selections[df_prevention_selections['KPType'] == 'FSW']['First Name']))
+    kpmsm = int(len(df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
+    kpgbv = int(len(df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['First Name']))
+    
+    KPPrev_fsw = 4152
+    KPPrev_msm = 2400
+    gbv = 1405 
+
+    fsw = round(((kpfsw/KPPrev_fsw)*100),1)
+    msm = round(((kpmsm/KPPrev_msm)*100),1)
+    p_gbv = round(((kpgbv/gbv)*100),1)
+
+    
+    hed1, hed2 =st.columns(2)
+    with hed1:
+        st.markdown(f"###### KP_PREV_FSW Target: {KPPrev_fsw}")
+        st.markdown(f"###### KP_PREV_FSW Target: {KPPrev_msm}")
+        st.markdown(f"###### KP_GBV Target: {gbv}")
+    with hed2:
+        st.markdown(f"###### KP_PREV_FSW Achievement: {kpfsw} ({fsw}%)")
+        st.markdown(f"###### KP_PREV_MSM Achievement: {kpmsm} ({msm}%)")
+        st.markdown(f"###### KP_GBV Achievement: {kpgbv} ({p_gbv}%)")
 
     st.plotly_chart(
         px.line(
@@ -47,7 +70,8 @@ def app():
                 category_orders={'Month':['October', 'November', 'December', 
                                         'January','February','March',
                                         'April','May','June',
-                                        'July','August','September']}
+                                        'July','August','September'],
+                                 'KPType':['FSW','MSM','PWID','TG']}
             ), use_container_width=True
         )
 
@@ -100,7 +124,7 @@ def app():
         st.plotly_chart(
             px.histogram(
                 data_frame=df_prevention_month,
-                y='Provider',
+                x='Provider',
                 color='Type_Of_Visit',
                 text_auto=True
             ),use_container_width=True
@@ -109,7 +133,7 @@ def app():
         st.plotly_chart(
             px.histogram(
                 data_frame=df_prevention_month[df_prevention_month['GBV'] != 'N/A'],
-                y='Provider',
+                x='Provider',
                 color='GBV',
                 text_auto=True
             ),use_container_width=True
