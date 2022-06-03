@@ -5,24 +5,24 @@ import mysql.connector
 import pandas as pd
 # ------------------------------------------------------------------------------------
 # %%
-# url = 'mysql+pymysql://vin:Vin123**@127.0.0.1:3306'
-# engine = create_engine(url, echo=True)
+url = 'mysql+pymysql://vin:Vin123**@127.0.0.1:3306'
+engine = create_engine(url, echo=True)
 
-# querry1 = open(r'sql_queries/etl_provider table.sql').read().split(';\n')
-# for line in querry1:
-#     line 
+querry1 = open(r'sql_queries/etl_provider table.sql').read().split(';\n')
+for line in querry1:
+    line 
 
-# sql1 = text('USE kenyaemr_etl')
-# engine.execute(sql1)
+sql1 = text('USE kenyaemr_etl')
+engine.execute(sql1)
 
-# sql2 = text('DROP TABLE IF EXISTS etl_provider')
-# engine.execute(sql2)
+sql2 = text('DROP TABLE IF EXISTS etl_provider')
+engine.execute(sql2)
 
-# sql3 = text('CREATE TABLE etl_provider (creator_id INT, provider VARCHAR(50))')
-# engine.execute(sql3)
+sql3 = text('CREATE TABLE etl_provider (creator_id VARCHAR(50), provider VARCHAR(50))')
+engine.execute(sql3)
 
-# sql4 = text(line)
-# engine.execute(sql4)
+sql4 = text(line)
+engine.execute(sql4)
 
 
 # %%
