@@ -9,41 +9,48 @@ from dataset import df_hts
 from dataset import df_ct
 from dataset import df_prevention
 
-
 # %%
-df_hts['Month'] = pd.Categorical(df_hts['Month'], categories=['October', 'November', 'December', 
-                                        'January','February','March',
-                                        'April','May','June',
-                                        'July','August','September'])
-df_hts['HTSResust'] = pd.Categorical(df_hts['HTSResult'], categories=['Negative', 'Positive'])
+df_hts['Month'] = pd.Categorical(
+    values= df_hts['Month'],
+    categories=['October', 'November', 'December',
+                'January', 'February', 'March',
+                'April', 'May', 'June',
+                'July', 'August', 'September'])
+
+df_hts['HTSResust'] = pd.Categorical(
+    values= df_hts['HTSResult'], 
+    categories=['Negative', 'Positive'])
+
 df_prevention['Month'] = pd.Categorical(
     values=df_prevention['Month'],
-    categories=['October', 'November', 'December', 
-                'January','February','March',
-                'April','May','June',
-                'July','August','September']
-)
+    categories=['October', 'November', 'December',
+                'January', 'February', 'March',
+                'April', 'May', 'June',
+                'July', 'August', 'September'])
+
 df_ct['Month'] = pd.Categorical(
     values=df_ct['Month'],
     categories=['October', 'November', 'December',
                 'January', 'February', 'March',
                 'April', 'May', 'June',
-                'July', 'August', 'September']
-)
+                'July', 'August', 'September'])
+
 df_ct['Last Visit Month'] = pd.Categorical(
     values=df_ct['Last Visit Month'],
     categories=['October', 'November', 'December',
                 'January', 'February', 'March',
                 'April', 'May', 'June',
-                'July', 'August', 'September']
-)
-
-
+                'July', 'August', 'September'])
 
 # %%
-TST_Target = 5582
-POS_Target = 76
-
+HTS_TST_TARGET = 5582
+HTS_TST_POS_TARGET = 76
+KP_PREV_FSW = 4152
+KP_PREV_MSM = 2400
+GEND_GBV_KP = 1405
+TX_CURR_KP = 764
+TX_NEW_KP = 72
+CxCa_KP = 191
 
 # %%
 st.set_page_config(
@@ -52,66 +59,6 @@ st.set_page_config(
     page_icon=':bar_chart:',
     initial_sidebar_state='collapsed'
 )
-
-def Overview():
-    st.markdown("##### Overview")
-    column1, column2 = st.columns(2)
-    with column1:
-        st.markdown(
-            "Chart 2"
-        )
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_overview,
-                x='KPType',
-                text_auto=True,
-                color='Program'
-            ), use_container_width=True
-        )
-
-        st.table(
-            pd.crosstab(
-                index=df_overview['KPType'],
-                columns=df_overview['Program'],
-            )
-        )
-
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_overview,
-                names='KPType'
-            ), use_container_width=True
-        )
-
-    with column2:
-        st.markdown(
-            "Chart 2"
-        )
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_overview,
-                x='AgeGroup',
-                category_orders={
-                    'AgeGroup': ['14yrs & below', '15-17yrs', '18-19yrs', '20-24yrs',
-                                 '25-29yrs', '30-34yrs', '35-39yrs', '40-44yrs', '45-49yrs', '50+yrs']
-                },
-                color='KPType',
-            ), use_container_width=True
-        )
-
-        st.table(
-            pd.crosstab(
-                index=df_overview['KPType'],
-                columns='count'
-            )
-        )
-
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_overview,
-                names='KPType'
-            ), use_container_width=True
-        )
 
 def page2():
     st.markdown('##### HIV Testing Services')
@@ -123,23 +70,28 @@ def page2():
 
     df_hts_selections = df_hts.query(
         "Financial_Year == @Financial_Year")
-    
-    KP = df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation']
 
-    TST_Achievement_Neg = int(len(KP[KP['HTSResult'] == 'Negative']['First Name']))
-    TST_Achievement_Pos = int(len(KP[KP['HTSResult'] == 'Positive']['First Name']))
+    KP = df_hts_selections[df_hts_selections['PopulationType']
+                           == 'KeyPopulation']
 
-    TST_Proportion = round(((TST_Achievement_Neg/TST_Target)*100),1)
-    Pos_Proportion = round(((TST_Achievement_Pos/POS_Target)*100),1)
-    
+    TST_Achievement_Neg = int(
+        len(KP[KP['HTSResult'] == 'Negative']['First Name']))
+    TST_Achievement_Pos = int(
+        len(KP[KP['HTSResult'] == 'Positive']['First Name']))
+
+    TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
+    Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)
+
     hed1, hed2 = st.columns(2)
 
     with hed1:
-        st.markdown(f"###### HTS_TST Target: {TST_Target}")
-        st.markdown(f"###### HTS_POS Target: {POS_Target}")
+        st.markdown(f"###### HTS_TST Target: {HTS_TST_TARGET}")
+        st.markdown(f"###### HTS_POS Target: {HTS_TST_POS_TARGET}")
     with hed2:
-        st.markdown(f"###### HTS_TST Achievement {TST_Achievement_Neg} ({TST_Proportion}%)")
-        st.markdown(f"###### HTS_POS Achievement {TST_Achievement_Pos} ({Pos_Proportion}%)")
+        st.markdown(
+            f"###### HTS_TST Achievement {TST_Achievement_Neg} ({TST_Proportion}%)")
+        st.markdown(
+            f"###### HTS_POS Achievement {TST_Achievement_Pos} ({Pos_Proportion}%)")
 
     st.plotly_chart(
         px.line(
@@ -152,59 +104,61 @@ def page2():
         ).update_traces(texttemplate="%{y}"),
         use_container_width=True
     )
-    col1, col2 = st.columns(2)  
+    col1, col2 = st.columns(2)
     with col1:
         st.plotly_chart(
             px.histogram(
                 data_frame=df_hts_selections,
-                x='Month', 
+                x='Month',
                 title='Monthly HTS_TST Achievement',
                 text_auto=True,
                 color='HTSResult',
-                category_orders={'Month':['October', 'November', 'December', 
-                                        'January','February','March',
-                                        'April','May','June',
-                                        'July','August','September']}
+                category_orders={'Month': ['October', 'November', 'December',
+                                           'January', 'February', 'March',
+                                           'April', 'May', 'June',
+                                           'July', 'August', 'September']}
             ), use_container_width=True
         )
         st.plotly_chart(
             px.histogram(
-                data_frame=df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation'],
+                data_frame=df_hts_selections[df_hts_selections['PopulationType']
+                                             == 'KeyPopulation'],
                 x='Month',
                 title='Monthly HTS_TST (KP) Achievement',
                 text_auto=True,
                 color='HTSResult',
-                category_orders={'Month':['October', 'November', 'December', 
-                                        'January','February','March',
-                                        'April','May','June',
-                                        'July','August','September']}
-            ),use_container_width=True
+                category_orders={'Month': ['October', 'November', 'December',
+                                           'January', 'February', 'March',
+                                           'April', 'May', 'June',
+                                           'July', 'August', 'September']}
+            ), use_container_width=True
         )
 
-    with col2:        
+    with col2:
         st.plotly_chart(
             px.line(
                 pd.crosstab(
-                index=df_hts_selections['Month'],
-                columns=df_hts_selections['HTSResult']
+                    index=df_hts_selections['Month'],
+                    columns=df_hts_selections['HTSResult']
                 ).cumsum(),
                 markers=True,
                 text='HTSResult',
                 title='Cumulative HTS_TST Achievement'
-            ).update_traces(texttemplate="%{y}"), 
+            ).update_traces(texttemplate="%{y}"),
             use_container_width=True
         )
 
         st.plotly_chart(
             px.line(
                 pd.crosstab(
-                    index=df_hts_selections[df_hts_selections['PopulationType'] == 'KeyPopulation']['Month'],
+                    index=df_hts_selections[df_hts_selections['PopulationType']
+                                            == 'KeyPopulation']['Month'],
                     columns=df_hts_selections['HTSResult']
                 ).cumsum(),
                 markers=True,
                 text='HTSResult',
                 title='Cumulative HTS_TST (KP) Achievement'
-            ).update_traces(texttemplate="%{y}"), 
+            ).update_traces(texttemplate="%{y}"),
             use_container_width=True
         )
 
@@ -217,8 +171,6 @@ def page2():
     df_hts_month = df_hts_selections.query(
         "Month == @Month")
 
-
-
     m1, m2 = st.columns(2)
     with m1:
         st.plotly_chart(
@@ -227,7 +179,7 @@ def page2():
                 x='Provider',
                 color='HTSResult',
                 text_auto=True,
-                category_orders={'HTSResult':['Negative','Positive']}
+                category_orders={'HTSResult': ['Negative', 'Positive']}
             ), use_container_width=True
         )
     with m2:
@@ -237,10 +189,10 @@ def page2():
                 x='Provider',
                 color='PopulationType',
                 text_auto=True,
-                category_orders={'PopulationType':['KeyPopulation','General Population']}
+                category_orders={'PopulationType': [
+                    'KeyPopulation', 'General Population']}
             ), use_container_width=True
         )
-
 
     @st.cache
     def convert_df(df):
@@ -269,29 +221,29 @@ def page3():
 
     df_prevention_selections = df_prevention.query(
         "Financial_Year == @Financial_Year")
-    
-    kpfsw = int(len(df_prevention_selections[df_prevention_selections['KPType'] == 'FSW']['First Name']))
-    kpmsm = int(len(df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
-    kpgbv = int(len(df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['First Name']))
-    
-    KPPrev_fsw = 4152
-    KPPrev_msm = 2400
-    gbv = 1405 
 
-    fsw = round(((kpfsw/KPPrev_fsw)*100),1)
-    msm = round(((kpmsm/KPPrev_msm)*100),1)
-    p_gbv = round(((kpgbv/gbv)*100),1)
+    kpfsw = int(len(
+        df_prevention_selections[df_prevention_selections['KPType'] == 'FSW']['First Name']))
+    kpmsm = int(len(
+        df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
+    kpGEND_GBV_KP = int(len(
+        df_prevention_selections[df_prevention_selections['GEND_GBV_KP'] != 'N/A']['First Name']))
 
-    
-    hed1, hed2 =st.columns(2)
+
+
+    fsw = round(((kpfsw/KP_PREV_FSW)*100), 1)
+    msm = round(((kpmsm/KP_PREV_MSM)*100), 1)
+    p_GEND_GBV_KP = round(((kpGEND_GBV_KP/GEND_GBV_KP)*100), 1)
+
+    hed1, hed2 = st.columns(2)
     with hed1:
-        st.markdown(f"###### KP_PREV_FSW Target: {KPPrev_fsw}")
-        st.markdown(f"###### KP_PREV_FSW Target: {KPPrev_msm}")
-        st.markdown(f"###### KP_GBV Target: {gbv}")
+        st.markdown(f"###### KP_PREV_FSW Target: {KP_PREV_FSW}")
+        st.markdown(f"###### KP_PREV_FSW Target: {KP_PREV_MSM}")
+        st.markdown(f"###### KP_GEND_GBV_KP Target: {GEND_GBV_KP}")
     with hed2:
         st.markdown(f"###### KP_PREV_FSW Achievement: {kpfsw} ({fsw}%)")
         st.markdown(f"###### KP_PREV_MSM Achievement: {kpmsm} ({msm}%)")
-        st.markdown(f"###### KP_GBV Achievement: {kpgbv} ({p_gbv}%)")
+        st.markdown(f"###### KP_GEND_GBV_KP Achievement: {kpGEND_GBV_KP} ({p_GEND_GBV_KP}%)")
 
     st.plotly_chart(
         px.line(
@@ -304,7 +256,7 @@ def page3():
         ).update_traces(texttemplate="%{y}"),
         use_container_width=True
     )
-    col1, col2 =st.columns(2)
+    col1, col2 = st.columns(2)
     with col1:
         st.plotly_chart(
             px.histogram(
@@ -312,46 +264,47 @@ def page3():
                 x='Month',
                 color='KPType',
                 text_auto=True,
-                category_orders={'Month':['October', 'November', 'December', 
-                                        'January','February','March',
-                                        'April','May','June',
-                                        'July','August','September'],
-                                 'KPType':['FSW','MSM','PWID','TG']}
+                category_orders={'Month': ['October', 'November', 'December',
+                                           'January', 'February', 'March',
+                                           'April', 'May', 'June',
+                                           'July', 'August', 'September'],
+                                 'KPType': ['FSW', 'MSM', 'PWID', 'TG']}
             ), use_container_width=True
         )
 
-        
     with col2:
         st.plotly_chart(
-        px.line(
-            pd.crosstab(
-                columns=df_prevention_selections['KPType'],
-                index=df_prevention_selections['Month']
-            ).cumsum(),
-            markers=True,
-            text='KPType'
-        ).update_traces(texttemplate="%{y}"),
-        use_container_width=True
+            px.line(
+                pd.crosstab(
+                    columns=df_prevention_selections['KPType'],
+                    index=df_prevention_selections['Month']
+                ).cumsum(),
+                markers=True,
+                text='KPType'
+            ).update_traces(texttemplate="%{y}"),
+            use_container_width=True
         )
 
     with col1:
         st.plotly_chart(
             px.histogram(
-                data_frame=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A'],
+                data_frame=df_prevention_selections[df_prevention_selections['GEND_GBV_KP'] != 'N/A'],
                 x='Month',
-                color='GBV',
+                color='GEND_GBV_KP',
                 text_auto=True
-            ),use_container_width=True
+            ), use_container_width=True
         )
-    
+
     with col2:
         st.plotly_chart(
             px.line(
                 pd.crosstab(
-                    columns=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['GBV'],
-                    index=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['Month']
+                    columns=df_prevention_selections[df_prevention_selections['GEND_GBV_KP']
+                                                     != 'N/A']['GEND_GBV_KP'],
+                    index=df_prevention_selections[df_prevention_selections['GEND_GBV_KP']
+                                                   != 'N/A']['Month']
                 ).cumsum(),
-                text='GBV'
+                text='GEND_GBV_KP'
             ).update_traces(texttemplate="%{y}"),
             use_container_width=True
         )
@@ -372,17 +325,18 @@ def page3():
                 x='Provider',
                 color='Type_Of_Visit',
                 text_auto=True
-            ),use_container_width=True
+            ), use_container_width=True
         )
     with col4:
         st.plotly_chart(
             px.histogram(
-                data_frame=df_prevention_month[df_prevention_month['GBV'] != 'N/A'],
+                data_frame=df_prevention_month[df_prevention_month['GEND_GBV_KP'] != 'N/A'],
                 x='Provider',
-                color='GBV',
+                color='GEND_GBV_KP',
                 text_auto=True
-            ),use_container_width=True
+            ), use_container_width=True
         )
+
     @st.cache
     def convert_df(df):
         # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -407,6 +361,8 @@ def page3():
     #     mime='text/csv',
     # )
     # st.dataframe(df_prep)
+
+
 def page4():
     st.markdown('##### Care & Treatment')
 
@@ -423,31 +379,27 @@ def page4():
     Fyc = df_ct_selections[df_ct_selections['Financial_Year'] == 'Vukisha_FY1']
     ca = Fyc[Fyc['Gender'] == 'F']
 
-    kpcurr = 764
-    kpnew = 72
-    cancer = 191
-    
-    curr = len(df_ct_selections[df_ct_selections['PopulationType'] == 'KeyPopulation']['First Name'])
+    curr = len(
+        df_ct_selections[df_ct_selections['PopulationType'] == 'KeyPopulation']['First Name'])
     new = len(Fy[Fy['PopulationType'] == 'KeyPopulation']['First Name'])
     cacx = len(Fyc[Fyc['CaCx'] == 'Screened']['First Name'])
 
-    currp = round(((curr/kpcurr)*100),1)
-    newp = round(((new/kpnew)*100),1)
-    cacxp = round(((cacx/cancer)*100),1)
+    currp = round(((curr/TX_CURR_KP)*100), 1)
+    newp = round(((new/TX_NEW_KP)*100), 1)
+    cacxp = round(((cacx/CxCa_KP)*100), 1)
 
     tx_curr = len(df_ct_selections['First Name'])
 
     hed1, hed2 = st.columns(2)
     st.markdown(f"")
     with hed1:
-        st.markdown(f"###### TX_NEW Target: {kpnew}")
-        st.markdown(f"###### TX_CURR Target: {kpcurr}")
-        st.markdown(f"###### CxCa (KP) Target: {cancer}")
+        st.markdown(f"###### TX_NEW Target: {TX_NEW_KP}")
+        st.markdown(f"###### TX_CURR Target: {TX_CURR_KP}")
+        st.markdown(f"###### CxCa (KP) Target: {CxCa_KP}")
     with hed2:
         st.markdown(f"###### TX_NEW Achievement: {new} ({newp}%)")
         st.markdown(f"###### TX_CURR Achievement: {curr} ({currp}%)")
         st.markdown(f"###### CxCa Achievement: {cacx} ({cacxp}%)")
-
 
     st.plotly_chart(
         px.line(
@@ -474,7 +426,7 @@ def page4():
                                            'July', 'August', 'September']}
             ), use_container_width=True
         )
-        
+
         st.plotly_chart(
             px.histogram(
                 data_frame=ca[ca['CaCx'] == 'Screened'],
@@ -572,6 +524,73 @@ def page4():
         mime='text/csv',
     )
     st.dataframe(df_ct_selections)
+def Overview():
+    
+    st.markdown("##### Overview")
+    ov1, ov2, ov3, ov4, ov5, ov6 = st.columns(6)
+    with ov1:
+        st.info(f"###### KP_PREV_FSW {KP_PREV_FSW}")
+    with ov2:
+        st.info(f"###### KP_PREV_MSM {KP_PREV_MSM}")
+
+    column1, column2 = st.columns(2)
+    with column1:
+        st.markdown(
+            "Chart 2"
+        )
+        st.plotly_chart(
+            px.histogram(
+                data_frame=df_overview,
+                x='KPType',
+                text_auto=True,
+                color='Program'
+            ), use_container_width=True
+        )
+
+        st.table(
+            pd.crosstab(
+                index=df_overview['KPType'],
+                columns=df_overview['Program'],
+            )
+        )
+
+        st.plotly_chart(
+            px.pie(
+                data_frame=df_overview,
+                names='KPType'
+            ), use_container_width=True
+        )
+
+    with column2:
+        st.markdown(
+            "Chart 2"
+        )
+        st.plotly_chart(
+            px.histogram(
+                data_frame=df_overview,
+                x='AgeGroup',
+                category_orders={
+                    'AgeGroup': ['14yrs & below', '15-17yrs', '18-19yrs', '20-24yrs',
+                                 '25-29yrs', '30-34yrs', '35-39yrs', '40-44yrs', '45-49yrs', '50+yrs']
+                },
+                color='KPType',
+            ), use_container_width=True
+        )
+
+        st.table(
+            pd.crosstab(
+                index=df_overview['KPType'],
+                columns='count'
+            )
+        )
+
+        st.plotly_chart(
+            px.pie(
+                data_frame=df_overview,
+                names='KPType'
+            ), use_container_width=True
+        )
+
 
 
 # %%
