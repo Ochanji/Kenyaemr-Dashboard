@@ -227,7 +227,7 @@ def page3():
     kpmsm = int(len(
         df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
     kpGEND_GBV_KP = int(len(
-        df_prevention_selections[df_prevention_selections['GEND_GBV_KP'] != 'N/A']['First Name']))
+        df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['First Name']))
 
 
 
@@ -288,9 +288,9 @@ def page3():
     with col1:
         st.plotly_chart(
             px.histogram(
-                data_frame=df_prevention_selections[df_prevention_selections['GEND_GBV_KP'] != 'N/A'],
+                data_frame=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A'],
                 x='Month',
-                color='GEND_GBV_KP',
+                color='GBV',
                 text_auto=True
             ), use_container_width=True
         )
@@ -299,12 +299,12 @@ def page3():
         st.plotly_chart(
             px.line(
                 pd.crosstab(
-                    columns=df_prevention_selections[df_prevention_selections['GEND_GBV_KP']
-                                                     != 'N/A']['GEND_GBV_KP'],
-                    index=df_prevention_selections[df_prevention_selections['GEND_GBV_KP']
+                    columns=df_prevention_selections[df_prevention_selections['GBV']
+                                                     != 'N/A']['GBV'],
+                    index=df_prevention_selections[df_prevention_selections['GBV']
                                                    != 'N/A']['Month']
                 ).cumsum(),
-                text='GEND_GBV_KP'
+                text='GBV'
             ).update_traces(texttemplate="%{y}"),
             use_container_width=True
         )
@@ -330,9 +330,9 @@ def page3():
     with col4:
         st.plotly_chart(
             px.histogram(
-                data_frame=df_prevention_month[df_prevention_month['GEND_GBV_KP'] != 'N/A'],
+                data_frame=df_prevention_month[df_prevention_month['GBV'] != 'N/A'],
                 x='Provider',
-                color='GEND_GBV_KP',
+                color='GBV',
                 text_auto=True
             ), use_container_width=True
         )
@@ -524,8 +524,8 @@ def page4():
         mime='text/csv',
     )
     st.dataframe(df_ct_selections)
+
 def Overview():
-    
     st.markdown("##### Overview")
     ov1, ov2, ov3, ov4, ov5, ov6 = st.columns(6)
     with ov1:
