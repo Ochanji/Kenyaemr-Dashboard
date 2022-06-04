@@ -21,8 +21,7 @@ df_hts['HTSResust'] = pd.Categorical(
     values= df_hts['HTSResult'], 
     categories=['Negative', 'Positive'])
 
-df_prevention['Month'] = pd.Categorical(
-    values=df_prevention['Month'],
+df_prevention['Month'] = pd.Categorical(values=df_prevention['Month'],
     categories=['October', 'November', 'December',
                 'January', 'February', 'March',
                 'April', 'May', 'June',
@@ -43,6 +42,7 @@ df_ct['Last Visit Month'] = pd.Categorical(
                 'July', 'August', 'September'])
 
 # %%
+# add indicators here
 HTS_TST_TARGET = 5582
 HTS_TST_POS_TARGET = 76
 KP_PREV_FSW = 4152
@@ -82,17 +82,15 @@ def page2():
     TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
     Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)
 
-    hed1, hed2 = st.columns(2)
-
-    with hed1:
-        st.markdown(f"###### HTS_TST Target: {HTS_TST_TARGET}")
-        st.markdown(f"###### HTS_POS Target: {HTS_TST_POS_TARGET}")
-    with hed2:
-        st.markdown(
-            f"###### HTS_TST Achievement {TST_Achievement_Neg} ({TST_Proportion}%)")
-        st.markdown(
-            f"###### HTS_POS Achievement {TST_Achievement_Pos} ({Pos_Proportion}%)")
-
+    hed1, hed2, hed3, hed4, hed5, hed6 = st.columns(6)
+    with st.container(): 
+        with hed1:
+            tst = f"##### HTS_TST_NEG(KP) \n###### Target: {HTS_TST_TARGET} \n###### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
+            st.info(f"{tst}")
+        with hed2:
+            pos = f"##### HTS_POS(KP) \n###### Target: {HTS_TST_POS_TARGET} \n###### Achievement: {TST_Achievement_Pos}({Pos_Proportion}%)"
+            st.info(f"{pos}")
+    
     st.plotly_chart(
         px.line(
             pd.crosstab(
@@ -209,10 +207,8 @@ def page2():
     )
     st.dataframe(df_hts_selections)
 
-
 def page3():
     st.markdown("##### Prevention")
-    st.markdown('#### :bar_chart: Prevention Dashboard')
     Financial_Year = st.multiselect(
         'Financial Year',
         options=df_prevention['Financial_Year'].unique(),
@@ -235,15 +231,17 @@ def page3():
     msm = round(((kpmsm/KP_PREV_MSM)*100), 1)
     p_GEND_GBV_KP = round(((kpGEND_GBV_KP/GEND_GBV_KP)*100), 1)
 
-    hed1, hed2 = st.columns(2)
-    with hed1:
-        st.markdown(f"###### KP_PREV_FSW Target: {KP_PREV_FSW}")
-        st.markdown(f"###### KP_PREV_FSW Target: {KP_PREV_MSM}")
-        st.markdown(f"###### KP_GEND_GBV_KP Target: {GEND_GBV_KP}")
-    with hed2:
-        st.markdown(f"###### KP_PREV_FSW Achievement: {kpfsw} ({fsw}%)")
-        st.markdown(f"###### KP_PREV_MSM Achievement: {kpmsm} ({msm}%)")
-        st.markdown(f"###### KP_GEND_GBV_KP Achievement: {kpGEND_GBV_KP} ({p_GEND_GBV_KP}%)")
+    hed1, hed2, hed3, hed4, hed5, hed6 = st.columns(6)
+    with st.container():
+        with hed1:
+            kpprevfsw = f"##### KP_PREV_FSW \n###### Target: {KP_PREV_FSW} \n###### Achievement: {kpfsw}({fsw})%"
+            st.info(f"{kpprevfsw}")
+        with hed2:
+            kpprevmsm = f"##### KP_PREV_MSM \n###### Target: {KP_PREV_MSM} \n###### Achievement: {kpmsm}({msm}%)"
+            st.info(f"{kpprevmsm}")
+        with hed3:
+            gendgbv = f"##### KP_GEND_GBV(KP) \n###### Target: {GEND_GBV_KP} \n###### Achievement: {kpGEND_GBV_KP}({p_GEND_GBV_KP}%)"
+            st.info(f"{gendgbv}")
 
     st.plotly_chart(
         px.line(
@@ -352,17 +350,6 @@ def page3():
     )
     st.dataframe(df_prevention_selections)
 
-    # csv = convert_df(df_prep)
-    # st.write('Prep Data')
-    # st.download_button(
-    #     label="Download data as CSV",
-    #     data=csv,
-    #     file_name='PrepNew Linelist extract.csv',
-    #     mime='text/csv',
-    # )
-    # st.dataframe(df_prep)
-
-
 def page4():
     st.markdown('##### Care & Treatment')
 
@@ -390,17 +377,20 @@ def page4():
 
     tx_curr = len(df_ct_selections['First Name'])
 
-    hed1, hed2 = st.columns(2)
-    st.markdown(f"")
-    with hed1:
-        st.markdown(f"###### TX_NEW Target: {TX_NEW_KP}")
-        st.markdown(f"###### TX_CURR Target: {TX_CURR_KP}")
-        st.markdown(f"###### CxCa (KP) Target: {CxCa_KP}")
-    with hed2:
-        st.markdown(f"###### TX_NEW Achievement: {new} ({newp}%)")
-        st.markdown(f"###### TX_CURR Achievement: {curr} ({currp}%)")
-        st.markdown(f"###### CxCa Achievement: {cacx} ({cacxp}%)")
+    hed1, hed2, hed3, hed4, hed5, hed6 = st.columns(6)
+    with st.container():
 
+        with hed1:
+            txcurr = f"##### TX_CURR(KP) \n###### Target: {TX_CURR_KP} \n###### Achievement: {curr}({currp}%)"
+            st.info(f"{txcurr}")
+
+        with hed2:
+            txnew = f"##### TX_NEW(KP) \n###### Target: {TX_NEW_KP} \n###### Achievement: {new}({newp}%)"
+            st.info(f"{txnew}")
+
+        with hed3:
+            cancer_ = f"##### CxCa(KP) \n###### Target: {CxCa_KP} \n###### Achievement: {cacx}({cacxp}%)"
+            st.info(f"{cancer_}")
     st.plotly_chart(
         px.line(
             pd.crosstab(
@@ -527,12 +517,6 @@ def page4():
 
 def Overview():
     st.markdown("##### Overview")
-    ov1, ov2, ov3, ov4, ov5, ov6 = st.columns(6)
-    with ov1:
-        st.info(f"###### KP_PREV_FSW {KP_PREV_FSW}")
-    with ov2:
-        st.info(f"###### KP_PREV_MSM {KP_PREV_MSM}")
-
     column1, column2 = st.columns(2)
     with column1:
         st.markdown(
