@@ -79,6 +79,7 @@ df_overview = pd.DataFrame(extract1)
 df_overview['AgeGroup'] = pd.cut(
     df_overview['Age'], bins=bins, labels=labels, right=False)
 
+
 # %%
 # C&T Data
 sql_query2 = open(

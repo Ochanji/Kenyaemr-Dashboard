@@ -794,8 +794,9 @@ def Overview():
                     color='Program',
                     barmode='group',
                     text_auto=True,
-                    title='Program Distribution Per Sub County'
-                ),use_container_width=True
+                    title='Program Distribution Per Sub County',
+                ),
+                use_container_width=True
             )
     st.map()
 # %%
