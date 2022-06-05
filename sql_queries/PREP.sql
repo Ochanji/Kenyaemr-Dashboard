@@ -1,5 +1,7 @@
 SELECT
-	DISTINCT UPPER(COALESCE(p.provider, 'NA')) AS 'Provider',
+	DISTINCT 
+    pe.patient_id,
+    UPPER(COALESCE(p.provider, 'NA')) AS 'Provider',
 	monthname(pe.visit_date) as 'Month',
 	pe.visit_date AS 'Date Started on PrEP',
 	CASE

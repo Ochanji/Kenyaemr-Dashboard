@@ -1,10 +1,12 @@
 # %%
 # Packages
+from multiprocessing.spawn import prepare
 from sqlalchemy import create_engine, text
 import mysql.connector
 import pandas as pd
 # ------------------------------------------------------------------------------------
 # %%
+# Creat provider table in kenyaemr_etl table
 url = 'mysql+pymysql://vin:Vin123**@127.0.0.1:3306'
 engine = create_engine(url, echo=True)
 
@@ -24,6 +26,25 @@ engine.execute(sql3)
 sql4 = text(line)
 engine.execute(sql4)
 
+querry2 = open(r'sql_queries/PREP.sql').read().split(';\n')
+for line2 in querry2:
+    line2
+
+querry3 = open(r'sql_queries/PREP ct.sql').read().split(';\n')
+for line3 in querry3:
+    line3
+
+sql5 = text(line2)
+results1 = engine.execute(sql5)
+
+sql6 = text(line3)
+results2 = engine.execute(sql6)
+
+prep = pd.DataFrame(results1.fetchall())
+
+prepct = pd.DataFrame(results2.fetchall())
+
+df_prep = pd.merge(left=prep, right=prepct, how='left', on='patient_id')
 
 # %%
 # Connection Instance
