@@ -21,7 +21,6 @@ SELECT
 		WHEN tst.visit_date BETWEEN '2025-10-01'
 		AND '2026-09-30' THEN 'Vukisha_FY5'
 	END AS 'Financial_Year',
-	tst.visit_date AS 'VisitDate',
 	YEAR(tst.visit_date) AS 'Year',
 	MONTHNAME(tst.visit_date) AS 'Month',
 	DAY(tst.visit_date) AS 'Date',

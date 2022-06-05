@@ -76,7 +76,7 @@ TB_STAT_KP = 33
 # %%
 st.set_page_config(
     layout='wide',
-    page_title='Performance Dashboard',
+    page_title='Dashboard',
     page_icon=':bar_chart:',
     initial_sidebar_state='collapsed'
 )
