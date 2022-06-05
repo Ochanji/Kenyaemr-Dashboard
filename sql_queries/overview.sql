@@ -14,7 +14,7 @@ SELECT
 	pd.Gender AS 'Gender',
 	CASE
 		WHEN co.visit_date IS NOT NULL
-		AND hv.visit_date IS NULL THEN 'KeyPOP'
+		AND hv.visit_date IS NULL THEN 'Prevention'
 		WHEN hv.visit_date IS NOT NULL
 		AND co.visit_date IS NOT NULL THEN 'HIV C&T'
 		ELSE 'GP Not Enrolled'

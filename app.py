@@ -73,7 +73,6 @@ TB_PREV_D_KP = 58
 TB_PREV_N_KP = 52
 TB_STAT_KP = 33
 
-
 # %%
 st.set_page_config(
     layout='wide',
@@ -107,16 +106,16 @@ def page2():
     hed1, hed2, hed3, hed4 = st.columns(4)
     with st.container(): 
         with hed1:
-            tst = f"##### HTS_TST_NEG(KP) \n###### Target: {HTS_TST_TARGET} \n###### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
+            tst = f"##### HTS_TST_NEG(KP) \n##### Target: {HTS_TST_TARGET} \n##### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
             st.info(f"{tst}")
         with hed2:
-            pos = f"##### HTS_POS(KP) \n###### Target: {HTS_TST_POS_TARGET} \n###### Achievement: {TST_Achievement_Pos}({Pos_Proportion}%)"
+            pos = f"##### HTS_POS(KP) \n##### Target: {HTS_TST_POS_TARGET} \n##### Achievement: {TST_Achievement_Pos}({Pos_Proportion}%)"
             st.info(f"{pos}")
         with hed3:
-            self = f"##### HTS_SELF(KP) \n###### Target: {HTS_SELF_KP} \n###### Achievement: "
+            self = f"##### HTS_SELF(KP) \n##### Target: {HTS_SELF_KP} \n##### Achievement: "
             st.info(f"{self}")
         with hed4:
-            recent = f"##### HTS_RECENT(KP) \n###### Target: {HTS_RECENT_KP} \n###### Achievement: "
+            recent = f"##### HTS_RECENT(KP) \n##### Target: {HTS_RECENT_KP} \n##### Achievement: "
             st.info(f"{recent}")
     
     st.plotly_chart(
@@ -270,19 +269,19 @@ def page3():
     hed1, hed2, hed3, hed4, hed5 = st.columns(5)
     with st.container():
         with hed1:
-            kpprevfsw = f"##### KP_PREV_FSW \n###### Target: {KP_PREV_FSW} \n###### Achievement: {kpfsw}({fsw})%"
+            kpprevfsw = f"##### KP_PREV_FSW \n##### Target: {KP_PREV_FSW} \n##### Achievement: {kpfsw}({fsw})%"
             st.info(f"{kpprevfsw}")
         with hed2:
-            kpprevmsm = f"##### KP_PREV_MSM \n###### Target: {KP_PREV_MSM} \n###### Achievement: {kpmsm}({msm}%)"
+            kpprevmsm = f"##### KP_PREV_MSM \n##### Target: {KP_PREV_MSM} \n##### Achievement: {kpmsm}({msm}%)"
             st.info(f"{kpprevmsm}")
         with hed3:
-            gendgbv = f"##### KP_GEND_GBV(KP) \n###### Target: {GEND_GBV_KP} \n###### Achievement: {kpGEND_GBV_KP}({p_GEND_GBV_KP}%)"
+            gendgbv = f"##### KP_GEND_GBV(KP) \n##### Target: {GEND_GBV_KP} \n##### Achievement: {kpGEND_GBV_KP}({p_GEND_GBV_KP}%)"
             st.info(f"{gendgbv}")
         with hed4:
-            prepnew = f"##### PREP_NEW(KP) \n###### Target: {PrEP_NEW_KP} \n###### Achievement: {pnew}({ppnew}%) "
+            prepnew = f"##### PREP_NEW(KP) \n##### Target: {PrEP_NEW_KP} \n##### Achievement: {pnew}({ppnew}%) "
             st.info(f"{prepnew}")
         with hed5:
-            prepct = f"##### PrEP_CT(KP) \n###### Target: {PrEP_CT_KP} \n###### Achievement: {pct}({ppct}%)"
+            prepct = f"##### PrEP_CT(KP) \n##### Target: {PrEP_CT_KP} \n##### Achievement: {pct}({ppct}%)"
             st.info(f"{prepct}")
     with st.container():
         st.plotly_chart(
@@ -473,30 +472,30 @@ def page4():
     with st.container():
 
         with hed1:
-            txcurr = f"##### TX_CURR(KP) \n###### Target: {TX_CURR_KP} \n###### Achievement: {curr}({currp}%)"
+            txcurr = f"##### TX_CURR(KP) \n##### Target: {TX_CURR_KP} \n##### Achievement: {curr}({currp}%)"
             st.info(f"{txcurr}")
 
         with hed2:
-            txnew = f"##### TX_NEW(KP) \n###### Target: {TX_NEW_KP} \n###### Achievement: {new}({newp}%)"
+            txnew = f"##### TX_NEW(KP) \n##### Target: {TX_NEW_KP} \n##### Achievement: {new}({newp}%)"
             st.info(f"{txnew}")
 
         with hed3:
-            cancer_ = f"##### CxCa(KP) \n###### Target: {CxCa_KP} \n###### Achievement: {cacx}({cacxp}%)"
+            cancer_ = f"##### CxCa(KP) \n##### Target: {CxCa_KP} \n##### Achievement: {cacx}({cacxp}%)"
             st.info(f"{cancer_}")
         with hed4:
-            pvlsd = f"##### TX_PVLS_D(KP) \n###### Target: {TX_PVLS_D_KP} \n###### Achievement: 0 (0%)"
+            pvlsd = f"##### TX_PVLS_D(KP) \n##### Target: {TX_PVLS_D_KP} \n##### Achievement: 0 (0%)"
             st.info(f"{pvlsd}")
         with hed5:
-            pvlsn = f"##### TX_PVLS_N(KP) \n###### Target: {TX_PVLS_N_KP} \n###### Achievement: 0 (0%)"
+            pvlsn = f"##### TX_PVLS_N(KP) \n##### Target: {TX_PVLS_N_KP} \n##### Achievement: 0 (0%)"
             st.info(f"{pvlsn}")
         with hed6:
-            tbstat = f"##### TB_STAT(KP) \n###### Target: {TB_STAT_KP} \n###### Achievemnt: "
+            tbstat = f"##### TB_STAT(KP) \n##### Target: {TB_STAT_KP} \n##### Achievemnt: "
             st.info(f"{tbstat}")
         with hed7:
-            tbprevd = f"##### TB_PREV_D(KP) \n###### Target: {TB_PREV_D_KP} \n###### Achievement: 0 (0%)"
+            tbprevd = f"##### TB_PREV_D(KP) \n##### Target: {TB_PREV_D_KP} \n##### Achievement: 0 (0%)"
             st.info(f"{tbprevd}")
         with hed8:
-            tbprevn = f"##### TB_PREV_N(KP) \n###### Target: {TB_PREV_N_KP} \n###### Achievement: 0 (0%)"
+            tbprevn = f"##### TB_PREV_N(KP) \n##### Target: {TB_PREV_N_KP} \n##### Achievement: 0 (0%)"
             st.info(f"{tbprevn}") 
     
     st.plotly_chart(
@@ -630,68 +629,175 @@ def page4():
 
 def Overview():
     st.markdown("##### Overview")
-    hed1, hed2, hed3, hed4, hed5,hed6 = st.columns(6)
+    #///////////////////////////////////////////////////////////////////////
+    hed1, hed2, hed3, hed4, hed5, hed6 =st.columns(6)
+    #HTS
+    Financial_Year = st.sidebar.multiselect(
+        'Select Year',
+        options=df_hts['Financial_Year'].unique(),
+        default=df_hts['Financial_Year'].iloc[-1]
+    )
+    df_hts_selections = df_hts.query(
+        "Financial_Year == @Financial_Year")
 
-    column1, column2 = st.columns(2)
-    with column1:
-        st.markdown(
-            "Chart 2"
-        )
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_overview,
-                x='KPType',
-                text_auto=True,
-                color='Program'
-            ), use_container_width=True
-        )
+    KP = df_hts_selections[df_hts_selections['PopulationType']
+                           == 'KeyPopulation']
+    TST_Achievement_Neg = int(
+        len(KP[KP['HTSResult'] == 'Negative']['First Name']))
+    TST_Achievement_Pos = int(
+        len(KP[KP['HTSResult'] == 'Positive']['First Name']))
+    TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
+    Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)
+    KP = df_hts_selections[df_hts_selections['PopulationType']
+                           == 'KeyPopulation']
+    TST_Achievement_Neg = int(
+        len(KP[KP['HTSResult'] == 'Negative']['First Name']))
+    TST_Achievement_Pos = int(
+        len(KP[KP['HTSResult'] == 'Positive']['First Name']))
+    TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
+    Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)  
+    #////////////////////////////////////////////////////////////////////////
+    # Prevention
+    Financial_Year = st.sidebar.multiselect(
+        'Financial Year',
+        options=df_prevention['Financial_Year'].unique(),
+        default=df_prevention['Financial_Year'].iloc[-1]
+    )
 
-        st.table(
-            pd.crosstab(
-                index=df_overview['KPType'],
-                columns=df_overview['Program'],
+    df_prevention_selections = df_prevention.query(
+        "Financial_Year == @Financial_Year")
+
+    kpfsw = int(len(
+        df_prevention_selections[df_prevention_selections['KPType'] == 'FSW']['First Name']))
+    kpmsm = int(len(
+        df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
+    kppwid =  int(len(
+        df_prevention_selections[df_prevention_selections['KPType'] == 'PWID']['First Name'])) 
+    kptg = int(len(
+        df_prevention_selections[df_prevention_selections['KPType'] == 'TG']['First Name'])) 
+    kpGEND_GBV_KP = int(len(
+        df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['First Name']))
+    prepnewdf = df_prep[df_prep['Financial_Year'] == 'Vukisha_FY1']
+    prepctdf = df_prep[df_prep['Status'] == 'Active']
+
+    pnew = len(prepnewdf)
+    pct = len(prepctdf)
+
+    fsw = round(((kpfsw/KP_PREV_FSW)*100), 1)
+    msm = round(((kpmsm/KP_PREV_MSM)*100), 1)
+    
+    p_GEND_GBV_KP = round(((kpGEND_GBV_KP/GEND_GBV_KP)*100), 1)
+    ppnew = round(((pnew/PrEP_NEW_KP)*100),1)
+    ppct = round(((pct/PrEP_CT_KP)*100),1)
+    #//////////////////////////////////////////////////////////////////////////
+    # Care & Treatment
+    Status = st.sidebar.multiselect(
+        'Select Care & Treament Status',
+        options=df_ct['Status'].unique(),
+        default=['On ART']
+    )
+
+    df_ct_selections = df_ct.query(
+        "Status == @Status")
+
+    Fy = df_ct_selections[df_ct_selections['Financial_Year_'] == 'Vukisha_FY1']
+    Fyc = df_ct_selections[df_ct_selections['Financial_Year'] == 'Vukisha_FY1']
+    ca = Fyc[Fyc['Gender'] == 'F']
+
+    curr = len(
+        df_ct_selections[df_ct_selections['PopulationType'] == 'KeyPopulation']['First Name'])
+    new = len(Fy[Fy['PopulationType'] == 'KeyPopulation']['First Name'])
+    cacx = len(Fyc[Fyc['CaCx'] == 'Screened']['First Name'])
+
+    currp = round(((curr/TX_CURR_KP)*100), 1)
+    newp = round(((new/TX_NEW_KP)*100), 1)
+    cacxp = round(((cacx/CxCa_KP)*100), 1)
+
+    tx_curr = len(df_ct_selections['First Name'])
+    #////////////////////////////////////////////////////////////////////////////    
+    with st.container():
+        with hed1:
+            st.info(f"##### County SNU: \n##### Population Estimate: \n##### Coverage: ")
+            tst = f"##### HTS_TST_NEG(KP) \n##### Target: {HTS_TST_TARGET} \n##### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
+            st.info(f"{tst}")
+            cancer_ = f"##### CxCa(KP) \n##### Target: {CxCa_KP} \n##### Achievement: {cacx}({cacxp}%)"
+            st.info(f"{cancer_}")
+            tbprevd = f"##### TB_PREV_D(KP) \n##### Target: {TB_PREV_D_KP} \n##### Achievement: 0 (0%)"
+            st.info(f"{tbprevd}")
+        with hed2:
+            kpprevfsw = f"##### KP_PREV_FSW \n##### Target: {KP_PREV_FSW} \n##### Achievement: {kpfsw}({fsw})%"
+            st.info(f"{kpprevfsw}")
+            pos = f"##### HTS_POS(KP) \n##### Target: {HTS_TST_POS_TARGET} \n##### Achievement: {TST_Achievement_Pos}({Pos_Proportion}%)"
+            st.info(f"{pos}")
+            txnew = f"##### TX_NEW(KP) \n##### Target: {TX_NEW_KP} \n##### Achievement: {new}({newp}%)"
+            st.info(f"{txnew}")
+            tbprevn = f"##### TB_PREV_N(KP) \n##### Target: {TB_PREV_N_KP} \n##### Achievement: 0 (0%)"
+            st.info(f"{tbprevn}") 
+        with hed3:
+            kpprevmsm = f"##### KP_PREV_MSM \n##### Target: {KP_PREV_MSM} \n##### Achievement: {kpmsm}({msm}%)"
+            st.info(f"{kpprevmsm}")  
+            self = f"##### HTS_SELF(KP) \n##### Target: {HTS_SELF_KP} \n##### Achievement: "
+            st.info(f"{self}")
+            txcurr = f"##### TX_CURR(KP) \n##### Target: {TX_CURR_KP} \n##### Achievement: {curr}({currp}%)"
+            st.info(f"{txcurr}")
+            gendgbv = f"##### KP_GEND_GBV(KP) \n##### Target: {GEND_GBV_KP} \n##### Achievement: {kpGEND_GBV_KP}({p_GEND_GBV_KP}%)"
+            st.info(f"{gendgbv}")
+        with hed4:
+            prepnew = f"##### PREP_NEW(KP) \n##### Target: {PrEP_NEW_KP} \n##### Achievement: {pnew}({ppnew}%) "
+            st.info(f"{prepnew}")
+            recent = f"##### HTS_RECENT(KP) \n##### Target: {HTS_RECENT_KP} \n##### Achievement: "
+            st.info(f"{recent}")
+            pvlsd = f"##### TX_PVLS_D(KP) \n##### Target: {TX_PVLS_D_KP} \n##### Achievement: 0 (0%)"
+            st.info(f"{pvlsd}")
+            pwid = f"##### KP_PrEV_PWID \n##### Target: N/A \n##### Achievement: {kppwid}"
+            st.info(f"{pwid}")
+
+        with hed5:
+            prepct = f"##### PrEP_CT(KP) \n##### Target: {PrEP_CT_KP} \n##### Achievement: {pct}({ppct}%)"
+            st.info(f"{prepct}")
+            txcurr = f"##### TX_CURR(KP) \n##### Target: {TX_CURR_KP} \n##### Achievement: {curr}({currp}%)"
+            st.info(f"{txcurr}")
+            pvlsn = f"##### TX_PVLS_N(KP) \n##### Target: {TX_PVLS_N_KP} \n##### Achievement: 0 (0%)"
+            st.info(f"{pvlsn}")
+            tg = f"##### KP_PrEV_PWID \n##### Target: N/A \n##### Achievement: {kptg}"
+            st.info(tg)
+        with hed6:
+            tst = f"##### HTS_TST_NEG(KP) \n##### Target: {HTS_TST_TARGET} \n##### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
+            st.info(f"{tst}")            
+            txnew = f"##### TX_NEW(KP) \n##### Target: {TX_NEW_KP} \n##### Achievement: {new}({newp}%)"
+            st.info(f"{txnew}")
+            tbstat = f"##### TB_STAT(KP) \n##### Target: {TB_STAT_KP} \n##### Achievemnt: "
+            st.info(f"{tbstat}")
+    chat1, chat2, chat3 = st.columns(3)   
+    with st.container():
+        with chat1:
+            st.plotly_chart(
+                px.pie(
+                    data_frame=df_overview,
+                    names='Sub_County',
+                    title='Sub County Proportion of Clients'
+                ), use_container_width=True
+            )       
+        with chat2:
+            st.plotly_chart(
+                px.pie(
+                    data_frame=df_overview,
+                    names='Program',
+                    title='Programs Proportion of Clients'
+                ),use_container_width=True
             )
-        )
-
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_overview,
-                names='KPType'
-            ), use_container_width=True
-        )
-
-    with column2:
-        st.markdown(
-            "Chart 2"
-        )
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_overview,
-                x='AgeGroup',
-                category_orders={
-                    'AgeGroup': ['14yrs & below', '15-17yrs', '18-19yrs', '20-24yrs',
-                                 '25-29yrs', '30-34yrs', '35-39yrs', '40-44yrs', '45-49yrs', '50+yrs']
-                },
-                color='KPType',
-            ), use_container_width=True
-        )
-
-        st.table(
-            pd.crosstab(
-                index=df_overview['KPType'],
-                columns='count'
+        with chat3:
+            st.plotly_chart(
+                px.histogram(
+                    data_frame=df_overview,
+                    x='Sub_County',
+                    color='Program',
+                    barmode='group',
+                    text_auto=True,
+                    title='Program Distribution Per Sub County'
+                ),use_container_width=True
             )
-        )
-
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_overview,
-                names='KPType'
-            ), use_container_width=True
-        )
-
-
-
+    st.map()
 # %%
 page_names_to_funcs = {
     "Overview": Overview,
