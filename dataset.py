@@ -1,6 +1,5 @@
 # %%
 # Packages
-from multiprocessing.spawn import prepare
 from sqlalchemy import create_engine, text
 import mysql.connector
 import pandas as pd
@@ -10,7 +9,7 @@ import pandas as pd
 url = 'mysql+pymysql://vin:Vin123**@127.0.0.1:3306'
 engine = create_engine(url, echo=True)
 
-querry1 = open(r'sql_queries/etl_provider table.sql').read().split(';\n')
+querry1 = open(r'sql_queries\etl_provider table.sql').read().split(';\n')
 for line in querry1:
     line 
 
