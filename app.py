@@ -41,6 +41,7 @@ df_ct['Last Visit Month'] = pd.Categorical(
                 'January', 'February', 'March',
                 'April', 'May', 'June',
                 'July', 'August', 'September'])
+
 df_prep['Month'] = pd.Categorical(
     values=df_prep['Month'],
     categories= ['October', 'November', 'December',
