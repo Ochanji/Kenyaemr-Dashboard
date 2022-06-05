@@ -8,6 +8,7 @@ streamlit = "*"
 pandas = "*"
 plotly = "*"
 sqlalchemy = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 
