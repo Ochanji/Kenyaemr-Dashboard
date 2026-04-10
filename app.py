@@ -1,813 +1,440 @@
-# %%
+"""
+app.py
+------
+KenyaEMR Dashboard - main Streamlit application.
+
+Four pages navigable via a radio selector:
+    1. Overview         - Programme-wide KPI scorecards
+    2. HIV Testing      - HTS_TST / HTS_TST_POS trends and breakdowns
+    3. Prevention       - KP_PREV, GBV, and PrEP uptake
+    4. Care & Treatment - TX_CURR, TX_NEW, TX_PVLS, TB indicators
+
+Run with:
+    streamlit run app.py
+"""
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# %%
-from dataset import df_overview
-from dataset import df_hts
-from dataset import df_ct
-from dataset import df_prevention
-from dataset import df_prep
-
-# %%
-df_hts['Month'] = pd.Categorical(
-    values= df_hts['Month'],
-    categories=['October', 'November', 'December',
-                'January', 'February', 'March',
-                'April', 'May', 'June',
-                'July', 'August', 'September'])
-
-df_hts['HTSResust'] = pd.Categorical(
-    values= df_hts['HTSResult'], 
-    categories=['Negative', 'Positive'])
-
-df_prevention['Month'] = pd.Categorical(values=df_prevention['Month'],
-    categories=['October', 'November', 'December',
-                'January', 'February', 'March',
-                'April', 'May', 'June',
-                'July', 'August', 'September'])
-
-df_ct['Month'] = pd.Categorical(
-    values=df_ct['Month'],
-    categories=['October', 'November', 'December',
-                'January', 'February', 'March',
-                'April', 'May', 'June',
-                'July', 'August', 'September'])
-
-df_ct['Last Visit Month'] = pd.Categorical(
-    values=df_ct['Last Visit Month'],
-    categories=['October', 'November', 'December',
-                'January', 'February', 'March',
-                'April', 'May', 'June',
-                'July', 'August', 'September'])
-
-df_prep['Month'] = pd.Categorical(
-    values=df_prep['Month'],
-    categories= ['October', 'November', 'December',
-                'January', 'February', 'March',
-                'April', 'May', 'June',
-                'July', 'August', 'September']
+from dataset import (
+    df_overview,
+    df_hts,
+    df_ct,
+    df_prevention,
+    df_prep,
 )
 
-# %%
-# HTS tarhest
-HTS_TST_TARGET = 5582
-HTS_TST_POS_TARGET = 76
-HTS_SELF_KP = 5442
-HTS_RECENT_KP = 57
-
-# Prevention Indicators
-KP_PREV_FSW = 4152
-KP_PREV_MSM = 2400
-GEND_GBV_KP = 1405
-PrEP_NEW_KP = 1006
-PrEP_CT_KP = 1409
-
-# Care & Treatment Indicators
-TX_CURR_KP = 764
-TX_NEW_KP = 72
-CxCa_KP = 191
-TX_PVLS_D_KP = 757
-TX_PVLS_N_KP = 719
-TB_PREV_D_KP = 58
-TB_PREV_N_KP = 52
-TB_STAT_KP = 33
-
-# %%
+# ---------------------------------------------------------------------------
+# Page config
+# ---------------------------------------------------------------------------
 st.set_page_config(
-    layout='wide',
-    page_title='Dashboard',
-    page_icon=':bar_chart:',
-    initial_sidebar_state='collapsed'
+    layout="wide",
+    page_title="KenyaEMR Dashboard",
+    page_icon=":bar_chart:",
+    initial_sidebar_state="collapsed",
 )
 
-def page2():
-    st.markdown('##### HIV Testing Services')
-    Financial_Year = st.multiselect(
-        'Select Year',
-        options=df_hts['Financial_Year'].unique(),
-        default=df_hts['Financial_Year'].iloc[-1]
-    )
+# ---------------------------------------------------------------------------
+# Shared month order (Oct FY start)
+# ---------------------------------------------------------------------------
+MONTH_ORDER = [
+    "October", "November", "December",
+    "January", "February", "March",
+    "April", "May", "June",
+    "July", "August", "September",
+]
 
-    df_hts_selections = df_hts.query(
-        "Financial_Year == @Financial_Year")
-
-    KP = df_hts_selections[df_hts_selections['PopulationType']
-                           == 'KeyPopulation']
-
-    TST_Achievement_Neg = int(
-        len(KP[KP['HTSResult'] == 'Negative']['First Name']))
-    TST_Achievement_Pos = int(
-        len(KP[KP['HTSResult'] == 'Positive']['First Name']))
-
-    TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
-    Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)
-
-    hed1, hed2, hed3, hed4 = st.columns(4)
-    with st.container(): 
-        with hed1:
-            tst = f"##### HTS_TST_NEG(KP) \n##### Target: {HTS_TST_TARGET} \n##### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
-            st.info(f"{tst}")
-        with hed2:
-            pos = f"##### HTS_POS(KP) \n##### Target: {HTS_TST_POS_TARGET} \n##### Achievement: {TST_Achievement_Pos}({Pos_Proportion}%)"
-            st.info(f"{pos}")
-        with hed3:
-            self = f"##### HTS_SELF(KP) \n##### Target: {HTS_SELF_KP} \n##### Achievement: "
-            st.info(f"{self}")
-        with hed4:
-            recent = f"##### HTS_RECENT(KP) \n##### Target: {HTS_RECENT_KP} \n##### Achievement: "
-            st.info(f"{recent}")
-    
-    st.plotly_chart(
-        px.line(
-            pd.crosstab(
-                index=df_hts_selections['Month'],
-                columns=df_hts_selections['HTSResult']
-            ),
-            markers=True,
-            text='HTSResult', 
-            title='HTS Trends'
-        ).update_traces(texttemplate="%{y}"),
-        use_container_width=True
-    )
-    col1, col2 = st.columns(2)
-    with col1:
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_hts_selections,
-                x='Month',
-                title='Monthly HTS_TST Achievement',
-                text_auto=True,
-                color='HTSResult',
-                category_orders={'Month': ['October', 'November', 'December',
-                                           'January', 'February', 'March',
-                                           'April', 'May', 'June',
-                                           'July', 'August', 'September']}
-            ), use_container_width=True
-        )
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_hts_selections[df_hts_selections['PopulationType']
-                                             == 'KeyPopulation'],
-                x='Month',
-                title='Monthly HTS_TST (KP) Achievement',
-                text_auto=True,
-                color='HTSResult',
-                category_orders={'Month': ['October', 'November', 'December',
-                                           'January', 'February', 'March',
-                                           'April', 'May', 'June',
-                                           'July', 'August', 'September']}
-            ), use_container_width=True
-        )
-
-    with col2:
-        st.plotly_chart(
-            px.line(
-                pd.crosstab(
-                    index=df_hts_selections['Month'],
-                    columns=df_hts_selections['HTSResult']
-                ).cumsum(),
-                markers=True,
-                text='HTSResult',
-                title='Cumulative HTS_TST Achievement'
-            ).update_traces(texttemplate="%{y}"),
-            use_container_width=True
-        )
-
-        st.plotly_chart(
-            px.line(
-                pd.crosstab(
-                    index=df_hts_selections[df_hts_selections['PopulationType']
-                                            == 'KeyPopulation']['Month'],
-                    columns=df_hts_selections['HTSResult']
-                ).cumsum(),
-                markers=True,
-                text='HTSResult',
-                title='Cumulative HTS_TST (KP) Achievement'
-            ).update_traces(texttemplate="%{y}"),
-            use_container_width=True
-        )
-
-    Month = st.multiselect(
-        'Month',
-        options=df_hts_selections['Month'].unique(),
-        default=df_hts_selections['Month'].iloc[-1]
-    )
-
-    df_hts_month = df_hts_selections.query(
-        "Month == @Month")
-
-    m1, m2 = st.columns(2)
-    with m1:
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_hts_month,
-                x='Provider',
-                color='HTSResult',
-                text_auto=True,
-                title='HTS_TST per Provider',
-                category_orders={'HTSResult': ['Negative', 'Positive']}
-            ), use_container_width=True
-        )
-    with m2:
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_hts_month,
-                x='Provider',
-                color='PopulationType',
-                text_auto=True,
-                title='Population HTS_TST per Provider',
-                category_orders={'PopulationType': [
-                    'KeyPopulation', 'General Population']}
-            ), use_container_width=True
-        )
-
-    @st.cache
-    def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
-        return df.to_csv().encode('utf-8')
-
-    csv = convert_df(df_hts_selections)
-
-    st.download_button(
-        label="Download data as CSV",
-        data=csv,
-        file_name='HTS Linelist extract.csv',
-        mime='text/csv',
-    )
-    st.dataframe(df_hts_selections)
-
-def page3():
-    st.markdown("##### Prevention")
-    Financial_Year = st.multiselect(
-        'Financial Year',
-        options=df_prevention['Financial_Year'].unique(),
-        default=df_prevention['Financial_Year'].iloc[-1]
-    )
-
-    df_prevention_selections = df_prevention.query(
-        "Financial_Year == @Financial_Year")
-
-    kpfsw = int(len(
-        df_prevention_selections[df_prevention_selections['KPType'] == 'FSW']['First Name']))
-    kpmsm = int(len(
-        df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
-    kpGEND_GBV_KP = int(len(
-        df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['First Name']))
-    prepnewdf = df_prep[df_prep['Financial_Year'] == 'Vukisha_FY1']
-    prepctdf = df_prep[df_prep['Status'] == 'Active']
-
-    pnew = len(prepnewdf)
-    pct = len(prepctdf)
-
-    fsw = round(((kpfsw/KP_PREV_FSW)*100), 1)
-    msm = round(((kpmsm/KP_PREV_MSM)*100), 1)
-    p_GEND_GBV_KP = round(((kpGEND_GBV_KP/GEND_GBV_KP)*100), 1)
-    ppnew = round(((pnew/PrEP_NEW_KP)*100),1)
-    ppct = round(((pct/PrEP_CT_KP)*100),1)
-
-    hed1, hed2, hed3, hed4, hed5 = st.columns(5)
-    with st.container():
-        with hed1:
-            kpprevfsw = f"##### KP_PREV_FSW \n##### Target: {KP_PREV_FSW} \n##### Achievement: {kpfsw}({fsw})%"
-            st.info(f"{kpprevfsw}")
-        with hed2:
-            kpprevmsm = f"##### KP_PREV_MSM \n##### Target: {KP_PREV_MSM} \n##### Achievement: {kpmsm}({msm}%)"
-            st.info(f"{kpprevmsm}")
-        with hed3:
-            gendgbv = f"##### KP_GEND_GBV(KP) \n##### Target: {GEND_GBV_KP} \n##### Achievement: {kpGEND_GBV_KP}({p_GEND_GBV_KP}%)"
-            st.info(f"{gendgbv}")
-        with hed4:
-            prepnew = f"##### PREP_NEW(KP) \n##### Target: {PrEP_NEW_KP} \n##### Achievement: {pnew}({ppnew}%) "
-            st.info(f"{prepnew}")
-        with hed5:
-            prepct = f"##### PrEP_CT(KP) \n##### Target: {PrEP_CT_KP} \n##### Achievement: {pct}({ppct}%)"
-            st.info(f"{prepct}")
-    with st.container():
-        st.plotly_chart(
-            px.line(
-                pd.crosstab(
-                    columns=df_prevention_selections['KPType'],
-                    index=df_prevention_selections['Month']
-                ),
-                markers=True,
-                text='KPType',
-                title='KP_PrEV Trends'
-            ).update_traces(texttemplate="%{y}"),
-            use_container_width=True
-        )
-        col1, col2 = st.columns(2)
-        with col1:
-            st.plotly_chart(
-                px.histogram(
-                    data_frame=df_prevention_selections,
-                    x='Month',
-                    color='KPType',
-                    text_auto=True,
-                    title='Monthly KP_PrEV Performance',
-                    category_orders={'Month': ['October', 'November', 'December',
-                                            'January', 'February', 'March',
-                                            'April', 'May', 'June',
-                                            'July', 'August', 'September'],
-                                    'KPType': ['FSW', 'MSM', 'PWID', 'TG']}
-                ), use_container_width=True
-            )
-
-        with col2:
-            st.plotly_chart(
-                px.line(
-                    pd.crosstab(
-                        columns=df_prevention_selections['KPType'],
-                        index=df_prevention_selections['Month']
-                    ).cumsum(),
-                    markers=True,
-                    text='KPType',
-                    title='Cummulative KP_PrEV Performance',
-                ).update_traces(texttemplate="%{y}"),
-                use_container_width=True
-            )
-
-        with col1:
-            st.plotly_chart(
-                px.histogram(
-                    data_frame=df_prevention_selections[df_prevention_selections['GBV'] != 'N/A'],
-                    x='Month',
-                    color='GBV',
-                    title='Monthly GEND_GBV Performance',
-                    text_auto=True
-                ), use_container_width=True
-            )
-
-        with col2:
-            st.plotly_chart(
-                px.line(
-                    pd.crosstab(
-                        columns=df_prevention_selections[df_prevention_selections['GBV']
-                                                        != 'N/A']['GBV'],
-                        index=df_prevention_selections[df_prevention_selections['GBV']
-                                                    != 'N/A']['Month']
-                    ).cumsum(),
-                    title='Cummulative GEND_GBV(KP) Performance',
-                    text='GBV'
-                ).update_traces(texttemplate="%{y}"),
-                use_container_width=True
-            )
-        with col1:
-            st.plotly_chart(
-                px.histogram(
-                    data_frame=prepnewdf,
-                    x='Month',
-                    color='PopulationType',
-                    category_orders={'Month': ['October', 'November', 'December',
-                                            'January', 'February', 'March',
-                                            'April', 'May', 'June',
-                                            'July', 'August', 'September'],
-                                            'PopulationType':['KeyPopulation','General Population']},
-                    text_auto=True,
-                    title='Monthtly PrEP_NEW Performance'
-                ),use_container_width=True
-            )
-        with col2:
-            st.plotly_chart(
-                px.line(
-                    pd.crosstab(
-                        index=prepnewdf['Month'],
-                        columns=prepnewdf['PopulationType']
-                    ).cumsum(),
-                    markers=True,
-                    text='PopulationType',
-                    title='Cummulative PrEP_NEW Performance'
-                ).update_traces(texttemplate="%{y}"),
-                use_container_width=True
-            )
-
-    Month = st.multiselect(
-        'Month',
-        options=df_prevention_selections['Month'].unique(),
-        default=df_prevention_selections['Month'].iloc[-1]
-    )
-
-    df_prevention_month = df_prevention_selections.query(
-        "Month == @Month")
-    col3, col4 = st.columns(2)
-    with col3:
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_prevention_month,
-                x='Provider',
-                color='Type_Of_Visit',
-                title='Provider Contribution to KP_PrEV',
-                text_auto=True
-            ), use_container_width=True
-        )
-    with col4:
-        st.plotly_chart(
-            px.histogram(
-                data_frame=df_prevention_month[df_prevention_month['GBV'] != 'N/A'],
-                x='Provider',
-                title='Provider GBV Case Identification',
-                color='GBV',
-                text_auto=True
-            ), use_container_width=True
-        )
-
-    @st.cache
-    def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
-        return df.to_csv().encode('utf-8')
-
-    csv = convert_df(df_prevention_selections)
-    st.write('Prevention Data')
-    st.download_button(
-        label="Download prevention data as CSV",
-        data=csv,
-        file_name='Prevention Linelist extract.csv',
-        mime='text/csv',
-    )
-    st.dataframe(df_prevention_selections)
-    @st.cache
-    def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
-        return df.to_csv().encode('utf-8')
-
-    csv = convert_df(df_prep)
-    st.write('Prep Data')
-    st.download_button(
-        label="Download data as CSV",
-        data=csv,
-        file_name='Prep Linelist extract.csv',
-        mime='text/csv',
-    )
-    st.dataframe(df_prep)
-
-def page4():
-    st.markdown('##### Care & Treatment')
-
-    Status = st.multiselect(
-        'Select Care & Treament Status',
-        options=df_ct['Status'].unique(),
-        default=['On ART']
-    )
-
-    df_ct_selections = df_ct.query(
-        "Status == @Status")
-
-    Fy = df_ct_selections[df_ct_selections['Financial_Year_'] == 'Vukisha_FY1']
-    Fyc = df_ct_selections[df_ct_selections['Financial_Year'] == 'Vukisha_FY1']
-    ca = Fyc[Fyc['Gender'] == 'F']
-
-    curr = len(
-        df_ct_selections[df_ct_selections['PopulationType'] == 'KeyPopulation']['First Name'])
-    new = len(Fy[Fy['PopulationType'] == 'KeyPopulation']['First Name'])
-    cacx = len(Fyc[Fyc['CaCx'] == 'Screened']['First Name'])
-
-    currp = round(((curr/TX_CURR_KP)*100), 1)
-    newp = round(((new/TX_NEW_KP)*100), 1)
-    cacxp = round(((cacx/CxCa_KP)*100), 1)
-
-    tx_curr = len(df_ct_selections['First Name'])
-
-    hed1, hed2, hed3, hed4 = st.columns(4)
-    hed5,hed6, hed7,hed8 = st.columns(4)
-    with st.container():
-
-        with hed1:
-            txcurr = f"##### TX_CURR(KP) \n##### Target: {TX_CURR_KP} \n##### Achievement: {curr}({currp}%)"
-            st.info(f"{txcurr}")
-
-        with hed2:
-            txnew = f"##### TX_NEW(KP) \n##### Target: {TX_NEW_KP} \n##### Achievement: {new}({newp}%)"
-            st.info(f"{txnew}")
-
-        with hed3:
-            cancer_ = f"##### CxCa(KP) \n##### Target: {CxCa_KP} \n##### Achievement: {cacx}({cacxp}%)"
-            st.info(f"{cancer_}")
-        with hed4:
-            pvlsd = f"##### TX_PVLS_D(KP) \n##### Target: {TX_PVLS_D_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{pvlsd}")
-        with hed5:
-            pvlsn = f"##### TX_PVLS_N(KP) \n##### Target: {TX_PVLS_N_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{pvlsn}")
-        with hed6:
-            tbstat = f"##### TB_STAT(KP) \n##### Target: {TB_STAT_KP} \n##### Achievemnt: "
-            st.info(f"{tbstat}")
-        with hed7:
-            tbprevd = f"##### TB_PREV_D(KP) \n##### Target: {TB_PREV_D_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{tbprevd}")
-        with hed8:
-            tbprevn = f"##### TB_PREV_N(KP) \n##### Target: {TB_PREV_N_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{tbprevn}") 
-    
-    st.plotly_chart(
-        px.line(
-            pd.crosstab(
-                index=Fy['Month'],
-                columns=Fy['PopulationType']
-            ),
-            markers=True,
-            title='TX_NEW Trends',
-            text='PopulationType'
-        ).update_traces(texttemplate="%{y}"), use_container_width=True
-    )
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.plotly_chart(
-            px.histogram(
-                data_frame=Fy,
-                x='Month',
-                color='PopulationType',
-                text_auto=True,
-                title='Monhtly TX_NEW  Performance',
-                category_orders={'Month': ['October', 'November', 'December',
-                                           'January', 'February', 'March',
-                                           'April', 'May', 'June',
-                                           'July', 'August', 'September']}
-            ), use_container_width=True
-        )
-
-        st.plotly_chart(
-            px.histogram(
-                data_frame=ca[ca['CaCx'] == 'Screened'],
-                x='Last Visit Month',
-                color='CaCx',
-                title='Monthly CxCa Performance',
-                # barmode='group',
-                text_auto=True,
-                category_orders={'Last Visit Month': ['October', 'November', 'December',
-                                                      'January', 'February', 'March',
-                                                      'April', 'May', 'June',
-                                                      'July', 'August', 'September']}
-            ), use_container_width=True
-        )
-    with col2:
-        st.plotly_chart(
-            px.line(
-                pd.crosstab(
-                    index=Fy['Month'],
-                    columns=Fy['PopulationType']
-                ).cumsum(),
-                title='Cummulative TX_NEW  Performance',
-                markers=True,
-                text='PopulationType'
-            ).update_traces(texttemplate="%{y}"), use_container_width=True
-        )
-
-        st.plotly_chart(
-            px.line(
-                pd.crosstab(
-                    index=ca[ca['CaCx'] == 'Screened']['Last Visit Month'],
-                    columns=ca[ca['CaCx'] == 'Screened']['CaCx']
-                ).cumsum(),
-                title='Cummulative CxCa Performance',
-                markers=True,
-                text='CaCx'
-            ).update_traces(texttemplate="%{y}"), use_container_width=True
-        )
-    col3, col4, col5 = st.columns(3)
-    with col3:
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_ct_selections,
-                names='VLResults',
-                color='VLResults',
-                title='Viral Load Results Proportions'
-            ), use_container_width=True
-        )
-        st.table(
-            pd.crosstab(
-                columns=df_ct_selections['VLResults'],
-                index=''
-            )
-        )
-    with col4:
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_ct_selections,
-                names='KeyPopulationType',
-                color='KeyPopulationType',
-                title='Key Population Proportions'
-            ), use_container_width=True
-        )
-        st.table(
-            pd.crosstab(
-                columns=df_ct_selections['KeyPopulationType'],
-                index=''
-            )
-        )
-
-    with col5:
-        st.plotly_chart(
-            px.pie(
-                data_frame=df_ct_selections[df_ct_selections['Gender'] == 'F'],
-                names='CaCx',
-                color='CaCx',
-                title='Proportion Screened for CxCa'
-            ), use_container_width=True
-        )
-        st.table(
-            pd.crosstab(
-                columns=df_ct_selections['CaCx'],
-                index=''
-            )
-        )
-
-    @st.cache
-    def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
-        return df.to_csv().encode('utf-8')
-
-    csv = convert_df(df_ct_selections)
-
-    st.download_button(
-        label="Download data as CSV",
-        data=csv,
-        file_name='C&T Lineslist extract.csv',
-        mime='text/csv',
-    )
-    st.dataframe(df_ct_selections)
-
-def Overview():
-    st.markdown("##### Overview")
-    #///////////////////////////////////////////////////////////////////////
-    hed1, hed2, hed3, hed4, hed5, hed6 =st.columns(6)
-    #HTS
-    Financial_Year = st.sidebar.multiselect(
-        'Select Year',
-        options=df_hts['Financial_Year'].unique(),
-        default=df_hts['Financial_Year'].iloc[-1]
-    )
-    df_hts_selections = df_hts.query(
-        "Financial_Year == @Financial_Year")
-
-    KP = df_hts_selections[df_hts_selections['PopulationType']
-                           == 'KeyPopulation']
-    TST_Achievement_Neg = int(
-        len(KP[KP['HTSResult'] == 'Negative']['First Name']))
-    TST_Achievement_Pos = int(
-        len(KP[KP['HTSResult'] == 'Positive']['First Name']))
-    TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
-    Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)
-    KP = df_hts_selections[df_hts_selections['PopulationType']
-                           == 'KeyPopulation']
-    TST_Achievement_Neg = int(
-        len(KP[KP['HTSResult'] == 'Negative']['First Name']))
-    TST_Achievement_Pos = int(
-        len(KP[KP['HTSResult'] == 'Positive']['First Name']))
-    TST_Proportion = round(((TST_Achievement_Neg/HTS_TST_TARGET)*100), 1)
-    Pos_Proportion = round(((TST_Achievement_Pos/HTS_TST_POS_TARGET)*100), 1)  
-    #////////////////////////////////////////////////////////////////////////
-    # Prevention
-    Financial_Year = st.sidebar.multiselect(
-        'Financial Year',
-        options=df_prevention['Financial_Year'].unique(),
-        default=df_prevention['Financial_Year'].iloc[-1]
-    )
-
-    df_prevention_selections = df_prevention.query(
-        "Financial_Year == @Financial_Year")
-
-    kpfsw = int(len(
-        df_prevention_selections[df_prevention_selections['KPType'] == 'FSW']['First Name']))
-    kpmsm = int(len(
-        df_prevention_selections[df_prevention_selections['KPType'] == 'MSM']['First Name']))
-    kppwid =  int(len(
-        df_prevention_selections[df_prevention_selections['KPType'] == 'PWID']['First Name'])) 
-    kptg = int(len(
-        df_prevention_selections[df_prevention_selections['KPType'] == 'TG']['First Name'])) 
-    kpGEND_GBV_KP = int(len(
-        df_prevention_selections[df_prevention_selections['GBV'] != 'N/A']['First Name']))
-    prepnewdf = df_prep[df_prep['Financial_Year'] == 'Vukisha_FY1']
-    prepctdf = df_prep[df_prep['Status'] == 'Active']
-
-    pnew = len(prepnewdf)
-    pct = len(prepctdf)
-
-    fsw = round(((kpfsw/KP_PREV_FSW)*100), 1)
-    msm = round(((kpmsm/KP_PREV_MSM)*100), 1)
-    
-    p_GEND_GBV_KP = round(((kpGEND_GBV_KP/GEND_GBV_KP)*100), 1)
-    ppnew = round(((pnew/PrEP_NEW_KP)*100),1)
-    ppct = round(((pct/PrEP_CT_KP)*100),1)
-    #//////////////////////////////////////////////////////////////////////////
-    # Care & Treatment
-    Status = st.sidebar.multiselect(
-        'Select Care & Treament Status',
-        options=df_ct['Status'].unique(),
-        default=['On ART']
-    )
-
-    df_ct_selections = df_ct.query(
-        "Status == @Status")
-
-    Fy = df_ct_selections[df_ct_selections['Financial_Year_'] == 'Vukisha_FY1']
-    Fyc = df_ct_selections[df_ct_selections['Financial_Year'] == 'Vukisha_FY1']
-    ca = Fyc[Fyc['Gender'] == 'F']
-
-    curr = len(
-        df_ct_selections[df_ct_selections['PopulationType'] == 'KeyPopulation']['First Name'])
-    new = len(Fy[Fy['PopulationType'] == 'KeyPopulation']['First Name'])
-    cacx = len(Fyc[Fyc['CaCx'] == 'Screened']['First Name'])
-
-    currp = round(((curr/TX_CURR_KP)*100), 1)
-    newp = round(((new/TX_NEW_KP)*100), 1)
-    cacxp = round(((cacx/CxCa_KP)*100), 1)
-
-    tx_curr = len(df_ct_selections['First Name'])
-    #////////////////////////////////////////////////////////////////////////////    
-    with st.container():
-        with hed1:
-            st.info(f"##### County SNU: \n##### Population Estimate: \n##### Coverage: ")
-            tst = f"##### HTS_TST_NEG(KP) \n##### Target: {HTS_TST_TARGET} \n##### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
-            st.info(f"{tst}")
-            cancer_ = f"##### CxCa(KP) \n##### Target: {CxCa_KP} \n##### Achievement: {cacx}({cacxp}%)"
-            st.info(f"{cancer_}")
-            tbprevd = f"##### TB_PREV_D(KP) \n##### Target: {TB_PREV_D_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{tbprevd}")
-        with hed2:
-            kpprevfsw = f"##### KP_PREV_FSW \n##### Target: {KP_PREV_FSW} \n##### Achievement: {kpfsw}({fsw})%"
-            st.info(f"{kpprevfsw}")
-            pos = f"##### HTS_POS(KP) \n##### Target: {HTS_TST_POS_TARGET} \n##### Achievement: {TST_Achievement_Pos}({Pos_Proportion}%)"
-            st.info(f"{pos}")
-            txnew = f"##### TX_NEW(KP) \n##### Target: {TX_NEW_KP} \n##### Achievement: {new}({newp}%)"
-            st.info(f"{txnew}")
-            tbprevn = f"##### TB_PREV_N(KP) \n##### Target: {TB_PREV_N_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{tbprevn}") 
-        with hed3:
-            kpprevmsm = f"##### KP_PREV_MSM \n##### Target: {KP_PREV_MSM} \n##### Achievement: {kpmsm}({msm}%)"
-            st.info(f"{kpprevmsm}")  
-            self = f"##### HTS_SELF(KP) \n##### Target: {HTS_SELF_KP} \n##### Achievement: "
-            st.info(f"{self}")
-            txcurr = f"##### TX_CURR(KP) \n##### Target: {TX_CURR_KP} \n##### Achievement: {curr}({currp}%)"
-            st.info(f"{txcurr}")
-            gendgbv = f"##### KP_GEND_GBV(KP) \n##### Target: {GEND_GBV_KP} \n##### Achievement: {kpGEND_GBV_KP}({p_GEND_GBV_KP}%)"
-            st.info(f"{gendgbv}")
-        with hed4:
-            prepnew = f"##### PREP_NEW(KP) \n##### Target: {PrEP_NEW_KP} \n##### Achievement: {pnew}({ppnew}%) "
-            st.info(f"{prepnew}")
-            recent = f"##### HTS_RECENT(KP) \n##### Target: {HTS_RECENT_KP} \n##### Achievement: "
-            st.info(f"{recent}")
-            pvlsd = f"##### TX_PVLS_D(KP) \n##### Target: {TX_PVLS_D_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{pvlsd}")
-            pwid = f"##### KP_PrEV_PWID \n##### Target: N/A \n##### Achievement: {kppwid}"
-            st.info(f"{pwid}")
-
-        with hed5:
-            prepct = f"##### PrEP_CT(KP) \n##### Target: {PrEP_CT_KP} \n##### Achievement: {pct}({ppct}%)"
-            st.info(f"{prepct}")
-            txcurr = f"##### TX_CURR(KP) \n##### Target: {TX_CURR_KP} \n##### Achievement: {curr}({currp}%)"
-            st.info(f"{txcurr}")
-            pvlsn = f"##### TX_PVLS_N(KP) \n##### Target: {TX_PVLS_N_KP} \n##### Achievement: 0 (0%)"
-            st.info(f"{pvlsn}")
-            tg = f"##### KP_PrEV_PWID \n##### Target: N/A \n##### Achievement: {kptg}"
-            st.info(tg)
-        with hed6:
-            tst = f"##### HTS_TST_NEG(KP) \n##### Target: {HTS_TST_TARGET} \n##### Achievement: {TST_Achievement_Neg}({TST_Proportion}%)"
-            st.info(f"{tst}")            
-            txnew = f"##### TX_NEW(KP) \n##### Target: {TX_NEW_KP} \n##### Achievement: {new}({newp}%)"
-            st.info(f"{txnew}")
-            tbstat = f"##### TB_STAT(KP) \n##### Target: {TB_STAT_KP} \n##### Achievemnt: "
-            st.info(f"{tbstat}")
-    chat1, chat2, chat3 = st.columns(3)   
-    with st.container():
-        with chat1:
-            st.plotly_chart(
-                px.pie(
-                    data_frame=df_overview,
-                    names='Sub_County',
-                    title='Sub County Proportion of Clients'
-                ), use_container_width=True
-            )       
-        with chat2:
-            st.plotly_chart(
-                px.pie(
-                    data_frame=df_overview,
-                    names='Program',
-                    title='Programs Proportion of Clients'
-                ),use_container_width=True
-            )
-        with chat3:
-            st.plotly_chart(
-                px.histogram(
-                    data_frame=df_overview,
-                    x='Sub_County',
-                    color='Program',
-                    barmode='group',
-                    text_auto=True,
-                    title='Program Distribution Per Sub County',
-                ),
-                use_container_width=True
-            )
-    st.map()
-# %%
-page_names_to_funcs = {
-    "Overview": Overview,
-    "HIV Testing Services": page2,
-    "Prevention Services": page3,
-    "HIV Care & Treatment": page4
+# ---------------------------------------------------------------------------
+# KPI Targets  (update each financial year)
+# ---------------------------------------------------------------------------
+TARGETS = {
+    "HTS_TST": 5582,
+    "HTS_TST_POS": 76,
+    "HTS_SELF_KP": 5442,
+    "KP_PREV_FSW": 4152,
+    "KP_PREV_MSM": 1028,
+    "KP_PREV_PWID": 1107,
+    "TX_CURR_KP": 1157,
+    "TX_NEW_KP": 124,
+    "TX_PVLS_N_KP": 0,
+    "TX_PVLS_D_KP": 757,
+    "TB_PREV_N_KP": 0,
+    "TB_PREV_D_KP": 89,
+    "TB_STAT_KP": 33,
 }
 
-selected_page = st.radio("Select a page", page_names_to_funcs.keys())
+# Apply ordered month categories to shared DataFrames once at startup
+for _df in [df_hts, df_prevention, df_ct, df_prep]:
+    if "Month" in _df.columns:
+        _df["Month"] = pd.Categorical(
+            _df["Month"], categories=MONTH_ORDER, ordered=True
+        )
 
-page_names_to_funcs[selected_page]()
+
+# ===========================================================================
+# HELPER
+# ===========================================================================
+def _pct(numerator: int, denominator: int) -> str:
+    """Return a percentage string, guarding against zero division."""
+    if not denominator:
+        return "0%"
+    return f"{round(numerator / denominator * 100, 1)}%"
+
+
+def _chart_layout(fig):
+    """Apply a consistent transparent background to a Plotly figure."""
+    fig.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(showgrid=False),
+        yaxis=dict(gridcolor="#e5e5e5"),
+    )
+    return fig
+
+
+# ===========================================================================
+# PAGE 1 - OVERVIEW
+# ===========================================================================
+def page_overview() -> None:
+    st.markdown("## Programme Overview")
+    st.caption("High-level KPI scorecards across all programme areas.")
+    st.divider()
+
+    with st.sidebar:
+        st.header("Filters")
+        fy = st.multiselect(
+            "Financial Year",
+            options=df_hts["Financial_Year"].unique(),
+            default=[df_hts["Financial_Year"].iloc[-1]],
+        )
+
+    df_h = df_hts[df_hts["Financial_Year"].isin(fy)]
+
+    # HTS scorecard
+    st.subheader("HIV Testing Services")
+    tst = len(df_h)
+    pos = len(df_h[df_h["HTSResult"] == "Positive"]) if "HTSResult" in df_h.columns else 0
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Tested (HTS_TST)", tst, _pct(tst, TARGETS["HTS_TST"]) + " of target")
+    c2.metric("Positive (HTS_TST_POS)", pos, _pct(pos, tst) + " positivity")
+    c3.metric("HTS_TST Target", TARGETS["HTS_TST"])
+    c4.metric("Positivity Target", TARGETS["HTS_TST_POS"])
+
+    st.divider()
+
+    # Treatment scorecard
+    st.subheader("HIV Care and Treatment")
+    tx_curr = len(df_ct[df_ct["Status"] == "On ART"]) if "Status" in df_ct.columns else 0
+    tx_new = len(df_ct[df_ct["Status"] == "New on ART"]) if "Status" in df_ct.columns else 0
+    c5, c6, c7, c8 = st.columns(4)
+    c5.metric("TX_CURR", tx_curr, _pct(tx_curr, TARGETS["TX_CURR_KP"]) + " of target")
+    c6.metric("TX_NEW", tx_new, _pct(tx_new, TARGETS["TX_NEW_KP"]) + " of target")
+    c7.metric("TX_CURR Target", TARGETS["TX_CURR_KP"])
+    c8.metric("TX_NEW Target", TARGETS["TX_NEW_KP"])
+
+    st.divider()
+
+    # Prevention scorecard
+    st.subheader("Prevention Services")
+    p1, p2, p3 = st.columns(3)
+    p1.metric("KP_PREV FSW Target", TARGETS["KP_PREV_FSW"])
+    p2.metric("KP_PREV MSM Target", TARGETS["KP_PREV_MSM"])
+    p3.metric("KP_PREV PWID Target", TARGETS["KP_PREV_PWID"])
+
+    # Overview summary chart
+    if not df_overview.empty:
+        st.divider()
+        st.subheader("Summary Chart")
+        cols = df_overview.columns.tolist()
+        if len(cols) >= 2:
+            fig = px.bar(
+                df_overview, x=cols[0], y=cols[1],
+                title="Programme KPI Overview",
+                color_discrete_sequence=["#0083B8"],
+                text_auto=True,
+            )
+            st.plotly_chart(_chart_layout(fig), use_container_width=True)
+
+
+# ===========================================================================
+# PAGE 2 - HIV TESTING SERVICES
+# ===========================================================================
+def page_hts() -> None:
+    st.markdown("## HIV Testing Services")
+    st.caption("Testing volumes, positivity trends, and disaggregated breakdowns.")
+    st.divider()
+
+    cf1, cf2 = st.columns(2)
+    fy = cf1.multiselect(
+        "Financial Year",
+        options=df_hts["Financial_Year"].unique(),
+        default=[df_hts["Financial_Year"].iloc[-1]],
+    )
+    result_filter = cf2.multiselect(
+        "HTS Result",
+        options=["Positive", "Negative"],
+        default=["Positive", "Negative"],
+    )
+
+    df_sel = df_hts[df_hts["Financial_Year"].isin(fy)]
+    if result_filter and "HTSResult" in df_sel.columns:
+        df_sel = df_sel[df_sel["HTSResult"].isin(result_filter)]
+
+    # KPI metrics
+    tst = len(df_sel)
+    pos = len(df_sel[df_sel["HTSResult"] == "Positive"]) if "HTSResult" in df_sel.columns else 0
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("HTS_TST", tst, f"Target: {TARGETS['HTS_TST']}")
+    k2.metric("HTS_TST_POS", pos, f"Target: {TARGETS['HTS_TST_POS']}")
+    k3.metric("Achievement", _pct(tst, TARGETS["HTS_TST"]))
+    k4.metric("Positivity Rate", _pct(pos, tst))
+
+    st.divider()
+
+    # Monthly trend
+    if "Month" in df_sel.columns and "HTSResult" in df_sel.columns:
+        monthly = df_sel.groupby(["Month", "HTSResult"]).size().reset_index(name="Count")
+        fig_t = px.bar(
+            monthly, x="Month", y="Count", color="HTSResult", barmode="group",
+            title="Monthly HTS Volume by Result",
+            color_discrete_map={"Positive": "#E74C3C", "Negative": "#27AE60"},
+            category_orders={"Month": MONTH_ORDER},
+            text_auto=True,
+        )
+        st.plotly_chart(_chart_layout(fig_t), use_container_width=True)
+
+    # Population type and gender breakdown
+    cl, cr = st.columns(2)
+    if "PopulationType" in df_sel.columns and "HTSResult" in df_sel.columns:
+        with cl:
+            pop = df_sel.groupby(["PopulationType", "HTSResult"]).size().reset_index(name="Count")
+            fig_pop = px.bar(
+                pop, x="PopulationType", y="Count", color="HTSResult", barmode="stack",
+                title="Testing by Population Type",
+                color_discrete_map={"Positive": "#E74C3C", "Negative": "#27AE60"},
+                text_auto=True,
+            )
+            st.plotly_chart(_chart_layout(fig_pop), use_container_width=True)
+
+    if "Gender" in df_sel.columns:
+        with cr:
+            gender = df_sel["Gender"].value_counts().reset_index()
+            gender.columns = ["Gender", "Count"]
+            fig_g = px.pie(gender, names="Gender", values="Count", title="Testing by Gender", hole=0.4)
+            st.plotly_chart(fig_g, use_container_width=True)
+
+    # Provider contribution
+    if "Provider" in df_sel.columns and "HTSResult" in df_sel.columns:
+        st.subheader("Provider Contribution")
+        prov = df_sel.groupby(["Provider", "HTSResult"]).size().reset_index(name="Count")
+        fig_prov = px.bar(
+            prov, x="Count", y="Provider", color="HTSResult", orientation="h",
+            title="Provider Contribution to HTS",
+            color_discrete_map={"Positive": "#E74C3C", "Negative": "#27AE60"},
+            text_auto=True,
+        )
+        fig_prov.update_layout(yaxis=dict(categoryorder="total ascending"))
+        st.plotly_chart(_chart_layout(fig_prov), use_container_width=True)
+
+    st.divider()
+    st.download_button(
+        "Download HTS Data (CSV)",
+        df_sel.to_csv(index=False).encode("utf-8"),
+        "hts_data.csv",
+        "text/csv",
+    )
+
+
+# ===========================================================================
+# PAGE 3 - PREVENTION SERVICES
+# ===========================================================================
+def page_prevention() -> None:
+    st.markdown("## Prevention Services")
+    st.caption("KP_PREV, GBV indicators, and PrEP uptake across financial years.")
+    st.divider()
+
+    cf1, cf2 = st.columns(2)
+    fy_opts = list(df_prevention["Financial_Year"].unique()) if "Financial_Year" in df_prevention.columns else []
+    fy = cf1.multiselect("Financial Year", options=fy_opts, default=fy_opts[:1])
+    months = cf2.multiselect("Month", options=MONTH_ORDER, default=MONTH_ORDER)
+
+    df_p = df_prevention.copy()
+    if fy and "Financial_Year" in df_p.columns:
+        df_p = df_p[df_p["Financial_Year"].isin(fy)]
+    if months and "Month" in df_p.columns:
+        df_p = df_p[df_p["Month"].isin(months)]
+
+    # KPI targets
+    st.subheader("KP Prevention Targets")
+    k1, k2, k3 = st.columns(3)
+    k1.metric("KP_PREV FSW", TARGETS["KP_PREV_FSW"])
+    k2.metric("KP_PREV MSM", TARGETS["KP_PREV_MSM"])
+    k3.metric("KP_PREV PWID", TARGETS["KP_PREV_PWID"])
+
+    st.divider()
+
+    # GBV trend
+    if "GBV" in df_p.columns and "Month" in df_p.columns:
+        cl, cr = st.columns(2)
+        with cl:
+            gbv = df_p.groupby(["Month", "GBV"]).size().reset_index(name="Count")
+            fig_gbv = px.bar(
+                gbv, x="Month", y="Count", color="GBV",
+                title="Cumulative GBV (KP) Performance",
+                category_orders={"Month": MONTH_ORDER},
+                text_auto=True,
+            )
+            st.plotly_chart(_chart_layout(fig_gbv), use_container_width=True)
+
+        with cr:
+            if "PopulationType" in df_p.columns:
+                prov = df_p.groupby(["PopulationType", "GBV"]).size().reset_index(name="Count")
+                fig_prov = px.bar(
+                    prov, x="Count", y="PopulationType", color="GBV", orientation="h",
+                    title="Provider Contribution to KP Prevention",
+                    text_auto=True,
+                )
+                fig_prov.update_layout(yaxis=dict(categoryorder="total ascending"))
+                st.plotly_chart(_chart_layout(fig_prov), use_container_width=True)
+
+    # PrEP uptake
+    st.subheader("PrEP Uptake")
+    if not df_prep.empty:
+        st.metric("Total PrEP Clients", len(df_prep))
+        if "Month" in df_prep.columns:
+            prep_monthly = df_prep.groupby("Month").size().reset_index(name="Count")
+            fig_prep = px.line(
+                prep_monthly, x="Month", y="Count",
+                title="Monthly PrEP Uptake",
+                markers=True,
+                category_orders={"Month": MONTH_ORDER},
+            )
+            fig_prep.update_traces(line_color="#0083B8")
+            st.plotly_chart(_chart_layout(fig_prep), use_container_width=True)
+
+    st.divider()
+    st.download_button(
+        "Download Prevention Data (CSV)",
+        df_p.to_csv(index=False).encode("utf-8"),
+        "prevention_data.csv",
+        "text/csv",
+    )
+
+
+# ===========================================================================
+# PAGE 4 - HIV CARE AND TREATMENT
+# ===========================================================================
+def page_ct() -> None:
+    st.markdown("## HIV Care and Treatment")
+    st.caption("TX_CURR, TX_NEW, TX_PVLS, TB_STAT, TB_PREV and VL suppression indicators.")
+    st.divider()
+
+    cf1, cf2 = st.columns(2)
+    fy_opts = list(df_ct["Financial_Year"].unique()) if "Financial_Year" in df_ct.columns else []
+    fy = cf1.multiselect("Financial Year", options=fy_opts, default=fy_opts[:1])
+    status_opts = list(df_ct["Status"].unique()) if "Status" in df_ct.columns else []
+    status = cf2.multiselect("Treatment Status", options=status_opts, default=status_opts)
+
+    df_c = df_ct.copy()
+    if fy and "Financial_Year" in df_c.columns:
+        df_c = df_c[df_c["Financial_Year"].isin(fy)]
+    if status and "Status" in df_c.columns:
+        df_c = df_c[df_c["Status"].isin(status)]
+
+    # KPI scorecards
+    st.subheader("Treatment Indicators")
+    tx_curr = len(df_c[df_c["Status"] == "On ART"]) if "Status" in df_c.columns else 0
+    tx_new = len(df_c[df_c["Status"] == "New on ART"]) if "Status" in df_c.columns else 0
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("TX_CURR (KP)", tx_curr, _pct(tx_curr, TARGETS["TX_CURR_KP"]) + " of target")
+    c2.metric("TX_NEW (KP)", tx_new, _pct(tx_new, TARGETS["TX_NEW_KP"]) + " of target")
+    c3.metric("TX_PVLS_N Target", TARGETS["TX_PVLS_N_KP"])
+    c4.metric("TX_PVLS_D Target", TARGETS["TX_PVLS_D_KP"])
+
+    st.divider()
+
+    # Monthly TX trends
+    if "Month" in df_c.columns and "Status" in df_c.columns:
+        cl, cr = st.columns(2)
+        with cl:
+            curr_monthly = (
+                df_c[df_c["Status"] == "On ART"]
+                .groupby("Month").size().reset_index(name="TX_CURR")
+            )
+            fig_curr = px.line(
+                curr_monthly, x="Month", y="TX_CURR",
+                title="TX_CURR Monthly Trend",
+                markers=True, category_orders={"Month": MONTH_ORDER},
+            )
+            fig_curr.update_traces(line_color="#27AE60")
+            st.plotly_chart(_chart_layout(fig_curr), use_container_width=True)
+
+        with cr:
+            new_monthly = (
+                df_c[df_c["Status"] == "New on ART"]
+                .groupby("Month").size().reset_index(name="TX_NEW")
+            )
+            fig_new = px.bar(
+                new_monthly, x="Month", y="TX_NEW",
+                title="TX_NEW Monthly Trend",
+                category_orders={"Month": MONTH_ORDER},
+                text_auto=True,
+                color_discrete_sequence=["#2980B9"],
+            )
+            st.plotly_chart(_chart_layout(fig_new), use_container_width=True)
+
+    # Age-sex distribution
+    if "AgeGroup" in df_c.columns and "Gender" in df_c.columns and "Status" in df_c.columns:
+        st.subheader("TX_CURR Age-Sex Distribution")
+        age_sex = (
+            df_c[df_c["Status"] == "On ART"]
+            .groupby(["AgeGroup", "Gender"])
+            .size().reset_index(name="Count")
+        )
+        if not age_sex.empty:
+            fig_age = px.bar(
+                age_sex, x="Count", y="AgeGroup", color="Gender",
+                barmode="overlay", orientation="h",
+                title="TX_CURR by Age Group and Gender",
+                color_discrete_map={"Female": "#E74C3C", "Male": "#2980B9"},
+                text_auto=True,
+            )
+            st.plotly_chart(_chart_layout(fig_age), use_container_width=True)
+
+    # TB indicators
+    st.divider()
+    st.subheader("TB Indicators (KP)")
+    tb1, tb2, tb3 = st.columns(3)
+    tb1.metric("TB_STAT Target", TARGETS["TB_STAT_KP"])
+    tb2.metric("TB_PREV_N Target", TARGETS["TB_PREV_N_KP"])
+    tb3.metric("TB_PREV_D Target", TARGETS["TB_PREV_D_KP"])
+
+    st.divider()
+    st.download_button(
+        "Download CT Data (CSV)",
+        df_c.to_csv(index=False).encode("utf-8"),
+        "ct_data.csv",
+        "text/csv",
+    )
+
+
+# ===========================================================================
+# PAGE ROUTER
+# ===========================================================================
+PAGES = {
+    "Overview": page_overview,
+    "HIV Testing Services": page_hts,
+    "Prevention Services": page_prevention,
+    "HIV Care and Treatment": page_ct,
+}
+
+selected = st.radio(
+    "Select page",
+    options=list(PAGES.keys()),
+    horizontal=True,
+    label_visibility="collapsed",
+)
+
+st.divider()
+PAGES[selected]()
