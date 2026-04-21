@@ -12,6 +12,12 @@ The **KenyaEMR Dashboard** provides health program managers and data analysts wi
 
 ---
 
+## Screenshot
+
+![KenyaEMR Dashboard](docs/screenshots/dashboard.png)
+
+---
+
 ## Features
 
 - **Overview Page** — High-level summary of all program KPIs at a glance
